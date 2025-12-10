@@ -24,6 +24,9 @@ import Sell from './pages/Sell'
 import Agents from './pages/Agents'
 import AgentDetail from './pages/AgentDetail'
 import ListProperty from './pages/ListProperty'
+import Dashboard from './pages/Dashboard'
+import SavedProperties from './pages/SavedProperties'
+import AdminPanel from './pages/AdminPanel'
 import 'react-toastify/dist/ReactToastify.css';
 
 
@@ -57,6 +60,9 @@ const App = () => {
         <Route path="/agents" element={<Agents />} />
         <Route path="/agents/:id" element={<AgentDetail />} />
         <Route path="/list-property" element={<ListProperty />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/saved-properties" element={<SavedProperties />} />
+        <Route path="/admin" element={<AdminPanel />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Footer />

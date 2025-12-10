@@ -8,6 +8,7 @@ import {
   Bath, 
   Maximize,
   Share2,
+  Heart,
   ChevronLeft,
   ChevronRight,
   Eye
@@ -19,6 +20,7 @@ const PropertyCard = ({ property, viewType }) => {
   const navigate = useNavigate();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showControls, setShowControls] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
 
   const handleNavigateToDetails = () => {
     navigate(`/properties/single/${property._id}`);
@@ -50,6 +52,12 @@ const PropertyCard = ({ property, viewType }) => {
     } else {
       setCurrentImageIndex((prev) => (prev - 1 + imagesCount) % imagesCount);
     }
+  };
+
+  const handleSave = (e) => {
+    e.stopPropagation();
+    setIsSaved(!isSaved);
+    // Future: Save to backend /api/users/:id/saved-properties
   };
 
   return (
@@ -120,6 +128,14 @@ const PropertyCard = ({ property, viewType }) => {
 
         {/* Action Buttons */}
         <div className="absolute top-4 right-4 flex flex-col gap-2">
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            onClick={handleSave}
+            className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-red-50 
+              transition-colors shadow-lg"
+          >
+            <Heart className={`w-4 h-4 transition-colors ${isSaved ? 'fill-red-600 text-red-600' : 'text-gray-700'}`} />
+          </motion.button>
           <motion.button
             whileHover={{ scale: 1.1 }}
             onClick={handleShare}
