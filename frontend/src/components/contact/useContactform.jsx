@@ -47,7 +47,8 @@ export default function useContactForm() {
     e.preventDefault();
     if (validateForm()) {
       try {
-        const response = await axios.post(`${Backendurl}/api/forms/submit`, formData);
+        // POST to /api/contact endpoint - email notifications queued for future implementation
+        const response = await axios.post(`${Backendurl}/api/contact`, formData);
         toast.success('Form submitted successfully!');
         // Reset form
         setFormData({ name: '', email: '', phone: '', message: '' });
@@ -56,7 +57,7 @@ export default function useContactForm() {
         console.error('Error submitting form:', error);
       }
     } else {
-      console.log('Validation errors:', errors); // Debugging log
+      console.log('Validation errors:', errors);
     }
   };
 

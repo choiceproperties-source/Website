@@ -14,8 +14,11 @@ const Apply = () => {
     property_type: 'apartment',
     budget_min: '',
     budget_max: '',
-    message: ''
+    message: '',
+    agent_preference: '' // For sellers/buyers who want specific agents
   });
+
+  const [validationErrors, setValidationErrors] = useState({});
 
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -28,33 +31,86 @@ const Apply = () => {
     }));
   };
 
+  const validateForm = () => {
+    const errors = {};
+
+    // Validate name
+    if (!formData.name.trim()) {
+      errors.name = 'Name is required';
+    } else if (formData.name.trim().length < 2) {
+      errors.name = 'Name must be at least 2 characters';
+    }
+
+    // Validate email
+    if (!formData.email.trim()) {
+      errors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+
+    // Validate phone
+    if (!formData.phone.trim()) {
+      errors.phone = 'Phone is required';
+    } else if (!/^[0-9\-\+\(\)\s]{10,}$/.test(formData.phone.replace(/\s/g, ''))) {
+      errors.phone = 'Please enter a valid phone number';
+    }
+
+    // Validate interested_in
+    if (!formData.interested_in) {
+      errors.interested_in = 'Please select an option';
+    }
+
+    // Budget validation for buyers
+    if (formData.interested_in === 'buy' && formData.budget_min && formData.budget_max) {
+      if (parseInt(formData.budget_min) > parseInt(formData.budget_max)) {
+        errors.budget = 'Minimum budget cannot exceed maximum budget';
+      }
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate form before submitting
+    if (!validateForm()) {
+      toast.error('Please fix the errors in the form');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // Submit to backend
-      await axios.post(`${Backendurl}/api/applications`, formData);
-      setSubmitted(true);
-      toast.success('Application submitted successfully!');
+      // Submit to backend with all fields
+      const response = await axios.post(`${Backendurl}/api/applications`, formData);
       
-      // Reset form after 3 seconds
-      setTimeout(() => {
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          interested_in: 'buy',
-          property_type: 'apartment',
-          budget_min: '',
-          budget_max: '',
-          message: ''
-        });
-        setSubmitted(false);
-      }, 3000);
+      if (response.data.success) {
+        setSubmitted(true);
+        toast.success('Application submitted successfully!');
+        
+        // Reset form after 3 seconds
+        setTimeout(() => {
+          setFormData({
+            name: '',
+            email: '',
+            phone: '',
+            interested_in: 'buy',
+            property_type: 'apartment',
+            budget_min: '',
+            budget_max: '',
+            message: '',
+            agent_preference: ''
+          });
+          setValidationErrors({});
+          setSubmitted(false);
+        }, 3000);
+      }
     } catch (error) {
       console.error('Error submitting application:', error);
-      toast.error('Failed to submit application. Please try again.');
+      const errorMessage = error.response?.data?.message || 'Failed to submit application. Please try again.';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -121,9 +177,12 @@ const Apply = () => {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${
+                  validationErrors.name ? 'border-red-500' : 'border-gray-300'
+                }`}
                 placeholder="John Doe"
               />
+              {validationErrors.name && <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>}
             </div>
 
             {/* Email */}
@@ -135,9 +194,12 @@ const Apply = () => {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${
+                  validationErrors.email ? 'border-red-500' : 'border-gray-300'
+                }`}
                 placeholder="john@example.com"
               />
+              {validationErrors.email && <p className="text-red-500 text-sm mt-1">{validationErrors.email}</p>}
             </div>
 
             {/* Phone */}
@@ -149,9 +211,12 @@ const Apply = () => {
                 value={formData.phone}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${
+                  validationErrors.phone ? 'border-red-500' : 'border-gray-300'
+                }`}
                 placeholder="(555) 123-4567"
               />
+              {validationErrors.phone && <p className="text-red-500 text-sm mt-1">{validationErrors.phone}</p>}
             </div>
 
             {/* Interested In */}
@@ -211,7 +276,25 @@ const Apply = () => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                 placeholder="500000"
               />
+              {validationErrors.budget && <p className="text-red-500 text-sm mt-1">{validationErrors.budget}</p>}
             </div>
+
+            {/* Conditional: Agent Preference for sellers/buyers */}
+            {(formData.interested_in === 'sell' || formData.interested_in === 'buy') && (
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Preferred Agent (Optional)</label>
+                <select
+                  name="agent_preference"
+                  value={formData.agent_preference}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                >
+                  <option value="">No preference</option>
+                  <option value="any">Any available agent</option>
+                  <option value="specialists">Real estate specialists</option>
+                </select>
+              </div>
+            )}
           </div>
 
           {/* Message */}

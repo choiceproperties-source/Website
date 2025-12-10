@@ -1,5 +1,6 @@
 import express from 'express';
 import AgentModel from '../models/AgentModel.js';
+import { adminAuth } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -49,9 +50,9 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/agents - Create agent (admin only)
-router.post('/', async (req, res) => {
+// Middleware placeholder: adminAuth validates JWT token (implementation pending)
+router.post('/', adminAuth, async (req, res) => {
   try {
-    // TODO: Add authentication middleware to check if admin
     const { name, email, phone, about, specialties, photo } = req.body;
 
     if (!name || !email || !phone) {

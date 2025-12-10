@@ -1,12 +1,13 @@
 import express from 'express';
 import ApplicationModel from '../models/ApplicationModel.js';
+import { adminAuth } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 // GET /api/applications - Get all applications (admin only)
-router.get('/', async (req, res) => {
+// Middleware placeholder: adminAuth validates JWT token (implementation pending)
+router.get('/', adminAuth, async (req, res) => {
   try {
-    // TODO: Add authentication middleware to check if admin
     const applications = await ApplicationModel.getAll();
     res.json({
       success: true,
@@ -25,12 +26,31 @@ router.get('/', async (req, res) => {
 // POST /api/applications - Submit application
 router.post('/', async (req, res) => {
   try {
-    const { name, email, phone, interested_in, interest_type, budget_min, budget_max, message } = req.body;
+    // Validate all required fields
+    const { name, email, phone, interested_in, property_type, budget_min, budget_max, message } = req.body;
 
-    if (!name || !email || !phone) {
+    if (!name || !email || !phone || !interested_in) {
       return res.status(400).json({
         success: false,
-        message: 'Missing required fields'
+        message: 'Missing required fields: name, email, phone, and interested_in are required'
+      });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid email format'
+      });
+    }
+
+    // Validate phone format (basic validation)
+    const phoneRegex = /^[0-9\-\+\(\)\s]+$/;
+    if (!phoneRegex.test(phone)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid phone format'
       });
     }
 
@@ -38,7 +58,9 @@ router.post('/', async (req, res) => {
       name,
       email,
       phone,
-      interested_in: interested_in || interest_type,
+      interested_in,
+      property_type,
+      budget_min,
       budget_max,
       message
     });
