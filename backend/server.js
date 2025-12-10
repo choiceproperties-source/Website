@@ -13,6 +13,10 @@ import appointmentRouter from './routes/appointmentRoute.js';
 import adminRouter from './routes/adminRoute.js';
 import propertyRoutes from './routes/propertyRoutes.js';
 import getStatusPage from './serverweb.js';
+import propertyListingRoute from './routes/propertyListingRoute.js';
+import applicationRoute from './routes/applicationRoute.js';
+import agentsRoute from './routes/agentsRoute.js';
+import contactRoute from './routes/contactRoute.js';
 
 
 dotenv.config();
@@ -94,6 +98,12 @@ app.use('/api/news', newsrouter);
 app.use('/api/appointments', appointmentRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api', propertyRoutes);
+
+// New Supabase-based routes
+app.use('/api/properties', propertyListingRoute);
+app.use('/api/applications', applicationRoute);
+app.use('/api/agents', agentsRoute);
+app.use('/api/contact', contactRoute);
 
 
 app.use((err, req, res, next) => {
