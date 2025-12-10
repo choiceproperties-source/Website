@@ -3,8 +3,8 @@ import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { Grid, List, SlidersHorizontal, MapPin, Home } from "lucide-react";
 import SearchBar from "./Searchbar.jsx";
-import FilterSection from "./Filtersection.jsx";
-import PropertyCard from "./Propertycard.jsx";
+import FilterSection from "./FilterSection.jsx";
+import PropertyCard from "./PropertyCard.jsx";
 import { Backendurl } from "../../App.jsx";
 
 const PropertiesPage = () => {
