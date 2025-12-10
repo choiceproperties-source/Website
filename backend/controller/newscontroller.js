@@ -1,14 +1,14 @@
-import News from "../models/newsmodel.js";
-import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import transporter from "../config/nodemailer.js";
-import { getEmailTemplate, getNewsletterTemplate } from "../email.js";
+import { getNewsletterTemplate } from "../email.js";
+import NewsModel from "../models/News.js";
+
+dotenv.config();
 
 const submitNewsletter = async (req, res) => {
   try {
     const { email } = req.body;
 
-    // Validate email
     if (!email) {
       return res.status(400).json({ 
         message: 'Email is required',
@@ -16,7 +16,6 @@ const submitNewsletter = async (req, res) => {
       });
     }
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ 
@@ -25,8 +24,7 @@ const submitNewsletter = async (req, res) => {
       });
     }
 
-    // Check if email already exists
-    const existingSubscription = await News.findOne({ email: email.toLowerCase().trim() });
+    const existingSubscription = await NewsModel.findByEmail(email);
     if (existingSubscription) {
       return res.status(400).json({ 
         message: 'Email already subscribed to newsletter',
@@ -34,16 +32,12 @@ const submitNewsletter = async (req, res) => {
       });
     }
 
-    const newNewsletter = new News({
-      email: email.toLowerCase().trim(),
-    });
-
-    const savedNewsletter = await newNewsletter.save();
+    await NewsModel.create({ email });
 
     const mailOptions = {
       from: process.env.EMAIL,
       to: email,
-      subject: "Welcome to BuildEstate Newsletter! 🏠",
+      subject: "Welcome to Choice Properties Newsletter!",
       html: getNewsletterTemplate(email),
     };
 

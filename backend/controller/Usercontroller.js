@@ -1,12 +1,9 @@
-import express from "express";
-import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import validator from "validator";
 import crypto from "crypto";
-import userModel from "../models/Usermodel.js";
+import UserModel from "../models/User.js";
 import transporter from "../config/nodemailer.js";
 import { getWelcomeTemplate } from "../email.js";
 import { getPasswordResetTemplate } from "../email.js";
@@ -24,14 +21,14 @@ dotenv.config();
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const Registeruser = await userModel.findOne({ email });
-    if (!Registeruser) {
+    const user = await UserModel.findByEmail(email);
+    if (!user) {
       return res.json({ message: "Email not found", success: false });
     }
-    const isMatch = await bcrypt.compare(password, Registeruser.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
-      const token = createtoken(Registeruser._id);
-      return res.json({ token, user: { name: Registeruser.name, email: Registeruser.email }, success: true });
+      const token = createtoken(user.id);
+      return res.json({ token, user: { name: user.name, email: user.email }, success: true });
     } else {
       return res.json({ message: "Invalid password", success: false });
     }
@@ -47,16 +44,20 @@ const register = async (req, res) => {
     if (!validator.isEmail(email)) {
       return res.json({ message: "Invalid email", success: false });
     }
+    
+    const existingUser = await UserModel.findByEmail(email);
+    if (existingUser) {
+      return res.json({ message: "Email already registered", success: false });
+    }
+    
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new userModel({ name, email, password: hashedPassword });
-    await newUser.save();
-    const token = createtoken(newUser._id);
+    const newUser = await UserModel.create({ name, email, password: hashedPassword });
+    const token = createtoken(newUser.id);
 
-    // send email
     const mailOptions = {
       from: process.env.EMAIL,
       to: email,
-      subject: "Welcome to BuildEstate - Your Account Has Been Created",
+      subject: "Welcome to Choice Properties - Your Account Has Been Created",
       html: getWelcomeTemplate(name)
     };
 
@@ -72,19 +73,22 @@ const register = async (req, res) => {
 const forgotpassword = async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await userModel.findOne({ email });
+    const user = await UserModel.findByEmail(email);
     if (!user) {
       return res.status(404).json({ message: "Email not found", success: false });
     }
     const resetToken = crypto.randomBytes(20).toString("hex");
-    user.resetToken = resetToken;
-    user.resetTokenExpire = Date.now() + 10 * 60 * 1000; // 1 hour
-    await user.save();
+    
+    await UserModel.update(user.id, {
+      resetToken: resetToken,
+      resetTokenExpire: new Date(Date.now() + 10 * 60 * 1000).toISOString()
+    });
+    
     const resetUrl = `${process.env.WEBSITE_URL}/reset/${resetToken}`;
     const mailOptions = {
       from: process.env.EMAIL,
       to: email,
-      subject: "Password Reset - BuildEstate Security",
+      subject: "Password Reset - Choice Properties Security",
       html: getPasswordResetTemplate(resetUrl)
     };
 
@@ -100,17 +104,19 @@ const resetpassword = async (req, res) => {
   try {
     const { token } = req.params;
     const { password } = req.body;
-    const user = await userModel.findOne({
+    const user = await UserModel.findOne({
       resetToken: token,
-      resetTokenExpire: { $gt: Date.now() },
+      resetTokenExpire: { $gt: Date.now() }
     });
     if (!user) {
       return res.status(400).json({ message: "Invalid or expired token", success: false });
     }
-    user.password = await bcrypt.hash(password, 10);
-    user.resetToken = undefined;
-    user.resetTokenExpire = undefined;
-    await user.save();
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await UserModel.update(user.id, {
+      password: hashedPassword,
+      resetToken: null,
+      resetTokenExpire: null
+    });
     return res.status(200).json({ message: "Password reset successful", success: true });
   } catch (error) {
     console.error(error);
@@ -143,19 +149,19 @@ const logout = async (req, res) => {
     }
 };
 
-// get name and email
-
 const getname = async (req, res) => {
   try {
-    const user = await userModel.findById(req.user.id).select("-password");
-    return res.json(user);
+    const user = await UserModel.getById(req.user.id);
+    if (!user) {
+      return res.json({ message: "User not found", success: false });
+    }
+    const { password, ...userWithoutPassword } = user;
+    return res.json(userWithoutPassword);
   }
   catch (error) {
     console.error(error);
     return res.json({ message: "Server error", success: false });
   }
 }
-
-
 
 export { login, register, forgotpassword, resetpassword, adminlogin, logout, getname };

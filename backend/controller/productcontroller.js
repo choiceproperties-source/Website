@@ -1,10 +1,10 @@
 import fs from "fs";
 import imagekit from "../config/imagekit.js";
-import Property from "../models/propertymodel.js";
+import PropertyModel from "../models/Property.js";
 
 const addproperty = async (req, res) => {
     try {
-        const { title, location, price, beds, baths, sqft, type, availability, description, amenities,phone } = req.body;
+        const { title, location, price, beds, baths, sqft, type, availability, description, amenities, phone } = req.body;
 
         const image1 = req.files.image1 && req.files.image1[0];
         const image2 = req.files.image2 && req.files.image2[0];
@@ -13,7 +13,6 @@ const addproperty = async (req, res) => {
 
         const images = [image1, image2, image3, image4].filter((item) => item !== undefined);
 
-        // Upload images to ImageKit and delete after upload
         const imageUrls = await Promise.all(
             images.map(async (item) => {
                 const result = await imagekit.upload({
@@ -28,8 +27,7 @@ const addproperty = async (req, res) => {
             })
         );
 
-        // Create a new product
-        const product = new Property({
+        await PropertyModel.create({
             title,
             location,
             price,
@@ -39,13 +37,10 @@ const addproperty = async (req, res) => {
             type,
             availability,
             description,
-            amenities,
+            amenities: typeof amenities === 'string' ? JSON.parse(amenities) : amenities,
             image: imageUrls,
             phone
         });
-
-        // Save the product to the database
-        await product.save();
 
         res.json({ message: "Product added successfully", success: true });
     } catch (error) {
@@ -56,7 +51,7 @@ const addproperty = async (req, res) => {
 
 const listproperty = async (req, res) => {
     try {
-        const property = await Property.find();
+        const property = await PropertyModel.getAll();
         res.json({ property, success: true });
     } catch (error) {
         console.log("Error listing products: ", error);
@@ -66,10 +61,11 @@ const listproperty = async (req, res) => {
 
 const removeproperty = async (req, res) => {
     try {
-        const property = await Property.findByIdAndDelete(req.body.id);
+        const property = await PropertyModel.getById(req.body.id);
         if (!property) {
             return res.status(404).json({ message: "Property not found", success: false });
         }
+        await PropertyModel.remove(req.body.id);
         return res.json({ message: "Property removed successfully", success: true });
     } catch (error) {
         console.log("Error removing product: ", error);
@@ -79,29 +75,28 @@ const removeproperty = async (req, res) => {
 
 const updateproperty = async (req, res) => {
     try {
-        const { id, title, location, price, beds, baths, sqft, type, availability, description, amenities,phone } = req.body;
+        const { id, title, location, price, beds, baths, sqft, type, availability, description, amenities, phone } = req.body;
 
-        const property = await Property.findById(id);
+        const property = await PropertyModel.getById(id);
         if (!property) {
-            console.log("Property not found with ID:", id); // Debugging line
+            console.log("Property not found with ID:", id);
             return res.status(404).json({ message: "Property not found", success: false });
         }
 
-        if (!req.files) {
-            // No new images provided
-            property.title = title;
-            property.location = location;
-            property.price = price;
-            property.beds = beds;
-            property.baths = baths;
-            property.sqft = sqft;
-            property.type = type;
-            property.availability = availability;
-            property.description = description;
-            property.amenities = amenities;
-            property.phone = phone;
-            // Keep existing images
-            await property.save();
+        if (!req.files || Object.keys(req.files).length === 0) {
+            await PropertyModel.update(id, {
+                title,
+                location,
+                price,
+                beds,
+                baths,
+                sqft,
+                type,
+                availability,
+                description,
+                amenities: typeof amenities === 'string' ? JSON.parse(amenities) : amenities,
+                phone
+            });
             return res.json({ message: "Property updated successfully", success: true });
         }
 
@@ -112,7 +107,6 @@ const updateproperty = async (req, res) => {
 
         const images = [image1, image2, image3, image4].filter((item) => item !== undefined);
 
-        // Upload images to ImageKit and delete after upload
         const imageUrls = await Promise.all(
             images.map(async (item) => {
                 const result = await imagekit.upload({
@@ -127,20 +121,21 @@ const updateproperty = async (req, res) => {
             })
         );
 
-        property.title = title;
-        property.location = location;
-        property.price = price;
-        property.beds = beds;
-        property.baths = baths;
-        property.sqft = sqft;
-        property.type = type;
-        property.availability = availability;
-        property.description = description;
-        property.amenities = amenities;
-        property.image = imageUrls;
-        property.phone = phone;
+        await PropertyModel.update(id, {
+            title,
+            location,
+            price,
+            beds,
+            baths,
+            sqft,
+            type,
+            availability,
+            description,
+            amenities: typeof amenities === 'string' ? JSON.parse(amenities) : amenities,
+            image: imageUrls,
+            phone
+        });
 
-        await property.save();
         res.json({ message: "Property updated successfully", success: true });
     } catch (error) {
         console.log("Error updating product: ", error);
@@ -151,7 +146,7 @@ const updateproperty = async (req, res) => {
 const singleproperty = async (req, res) => {
     try {
         const { id } = req.params;
-        const property = await Property.findById(id);
+        const property = await PropertyModel.getById(id);
         if (!property) {
             return res.status(404).json({ message: "Property not found", success: false });
         }
@@ -162,4 +157,4 @@ const singleproperty = async (req, res) => {
     }
 };
 
-export { addproperty, listproperty, removeproperty, updateproperty , singleproperty};
+export { addproperty, listproperty, removeproperty, updateproperty, singleproperty };

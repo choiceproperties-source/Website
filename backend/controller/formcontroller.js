@@ -1,18 +1,15 @@
-import Form from '../models/formmodel.js';
+import FormModel from '../models/Form.js';
 
 export const submitForm = async (req, res) => {
   try {
-    const { name, email, phone, message } = req.body; // Debugging log
+    const { name, email, phone, message } = req.body;
 
-    const newForm = new Form({
+    await FormModel.create({
       name,
       email,
       phone,
       message,
     });
-
-    const savedForm = await newForm.save();
-    
 
     res.json({ message: 'Form submitted successfully' });
   } catch (error) {
