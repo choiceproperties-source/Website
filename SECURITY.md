@@ -1,31 +1,61 @@
 # Security Policy
 
+## Environment Variables
 
+All sensitive configuration should be stored in `.env` files, which are **never** committed to the repository.
 
-## Supported Versions
+### Setup Instructions
 
-Use this section to tell people about which versions of your project are currently being supported with security updates.
+1. **Backend Setup**
+   ```bash
+   cp backend/.env.example backend/.env
+   # Edit backend/.env and fill in your actual credentials
+   ```
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+2. **Frontend Setup**
+   ```bash
+   cp frontend/.env.example frontend/.env
+   # Edit frontend/.env and fill in your configuration
+   ```
 
-## Reporting a Vulnerability
+### Protected Secrets
 
-We take the security of Choice Properties seriously. If you believe you've found a security vulnerability, please follow these steps:
+Never commit the following to the repository:
+- `SUPABASE_URL` and `SUPABASE_KEY` (database credentials)
+- `JWT_SECRET` (authentication secret)
+- `IMAGEKIT_PRIVATE_KEY` (private keys)
+- `SMTP_PASS` (email service password)
+- `AZURE_API_KEY` (AI service keys)
+- `FIRECRAWL_API_KEY` (web scraping API key)
+- Any other API keys or authentication tokens
 
-1. **Do not disclose the vulnerability publicly**
-2. **Email the details to aayushvaghela12@gmail.com**
-   - Include a description of the vulnerability
-   - Steps to reproduce the issue
-   - Potential impact
-   - Suggestions for remediation if available
+### .gitignore Configuration
 
-## What to expect
-- We will acknowledge receipt of your report within 48 hours
-- We will provide an initial assessment of the report within 5 business days
-- We will keep you informed about our progress in addressing the issue
-- After the issue is resolved, we may publicly acknowledge your responsible disclosure
+The repository includes proper `.gitignore` configuration that prevents accidental commits:
+- `.env` files are ignored
+- `.env.local` files are ignored
+- `.env.*.local` files are ignored
+- No credentials are ever tracked by git
 
-Thank you for helping keep Choice Properties and our users safe!
+### Verification
+
+To verify no secrets are committed:
+```bash
+# Check git history for secrets (if needed)
+git log -p | grep -E "SUPABASE_KEY|JWT_SECRET|IMAGEKIT_PRIVATE_KEY"
+```
+
+All variables should reference `process.env.*` in code, never hardcoded values.
+
+### Production Deployment
+
+For production:
+1. Use your hosting platform's environment variable management (Render, Railway, Vercel, etc.)
+2. Set strong, unique values for all secrets
+3. Rotate API keys regularly
+4. Never share `.env` files with others
+5. Use different credentials for development and production
+
+## Reporting Security Issues
+
+If you discover a security vulnerability, please email security@choiceproperties.com instead of using the issue tracker.
