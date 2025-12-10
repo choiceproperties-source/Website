@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
-import userModel from "../models/Usermodel.js";
+import UserModel from "../models/User.js";
+import AppointmentModel from "../models/Appointment.js";
 
 export const protect = async (req, res, next) => {
   try {
@@ -13,7 +14,7 @@ export const protect = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await userModel.findById(decoded.id).select("-password");
+    const user = await UserModel.getById(decoded.id);
 
     if (!user) {
       return res.status(401).json({
@@ -22,7 +23,8 @@ export const protect = async (req, res, next) => {
       });
     }
 
-    req.user = user;
+    const { password, ...userWithoutPassword } = user;
+    req.user = userWithoutPassword;
     next();
   } catch (error) {
     console.error("Auth error:", error);
@@ -33,10 +35,9 @@ export const protect = async (req, res, next) => {
   }
 };
 
-// In backend/middleware/authmiddleware.js
 export const checkAppointmentOwnership = async (req, res, next) => {
   try {
-    const appointment = await Appointment.findById(req.params.id);
+    const appointment = await AppointmentModel.getById(req.params.id);
     if (!appointment) {
       return res.status(404).json({
         success: false,
@@ -44,7 +45,7 @@ export const checkAppointmentOwnership = async (req, res, next) => {
       });
     }
 
-    if (appointment.userId.toString() !== req.user._id.toString()) {
+    if (appointment.userId.id.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
         message: "Not authorized to access this appointment",

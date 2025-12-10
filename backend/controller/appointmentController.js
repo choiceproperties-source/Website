@@ -1,11 +1,10 @@
-import Stats from '../models/statsModel.js';
-import Property from '../models/propertymodel.js';
-import Appointment from '../models/appointmentModel.js';
-import User from '../models/Usermodel.js';
+import StatsModel from '../models/Stats.js';
+import PropertyModel from '../models/Property.js';
+import AppointmentModel from '../models/Appointment.js';
+import UserModel from '../models/User.js';
 import transporter from "../config/nodemailer.js";
-import { getSchedulingEmailTemplate,getEmailTemplate } from '../email.js';
+import { getSchedulingEmailTemplate, getEmailTemplate } from '../email.js';
 
-// Format helpers
 const formatRecentProperties = (properties) => {
   return properties.map(property => ({
     type: 'property',
@@ -17,12 +16,13 @@ const formatRecentProperties = (properties) => {
 const formatRecentAppointments = (appointments) => {
   return appointments.map(appointment => ({
     type: 'appointment',
-    description: `${appointment.userId.name} scheduled viewing for ${appointment.propertyId.title}`,
+    description: appointment.userId && appointment.propertyId
+      ? `${appointment.userId.name} scheduled viewing for ${appointment.propertyId.title}`
+      : 'Appointment scheduled',
     timestamp: appointment.createdAt
   }));
 };
 
-// Main stats controller
 export const getAdminStats = async (req, res) => {
   try {
     const [
@@ -34,10 +34,10 @@ export const getAdminStats = async (req, res) => {
       viewsData,
       revenue
     ] = await Promise.all([
-      Property.countDocuments(),
-      Property.countDocuments({ status: 'active' }),
-      User.countDocuments(),
-      Appointment.countDocuments({ status: 'pending' }),
+      PropertyModel.count(),
+      PropertyModel.count({ status: 'active' }),
+      UserModel.count(),
+      AppointmentModel.count({ status: 'pending' }),
       getRecentActivity(),
       getViewsData(),
       calculateRevenue()
@@ -64,79 +64,28 @@ export const getAdminStats = async (req, res) => {
   }
 };
 
-// Activity tracker
 const getRecentActivity = async () => {
   try {
-    const [recentProperties, recentAppointments] = await Promise.all([
-      Property.find()
-        .sort({ createdAt: -1 })
-        .limit(5)
-        .select('title createdAt'),
-      Appointment.find()
-        .sort({ createdAt: -1 })
-        .limit(5)
-        .populate('propertyId', 'title')
-        .populate('userId', 'name')
-    ]);
+    const recentProperties = await PropertyModel.findRecent(5, 'id, title, created_at');
+    const recentAppointments = await AppointmentModel.findRecent(5);
+
+    const validAppointments = recentAppointments.filter(
+      appointment => appointment.userId && appointment.propertyId
+    );
 
     return [
       ...formatRecentProperties(recentProperties),
-      ...formatRecentAppointments(recentAppointments)
-    ].sort((a, b) => b.timestamp - a.timestamp);
+      ...formatRecentAppointments(validAppointments)
+    ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
   } catch (error) {
     console.error('Error getting recent activity:', error);
     return [];
   }
 };
 
-// Views analytics
 const getViewsData = async () => {
   try {
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const stats = await Stats.aggregate([
-      {
-        $match: {
-          endpoint: /^\/api\/products\/single\//,
-          method: 'GET',
-          timestamp: { $gte: thirtyDaysAgo }
-        }
-      },
-      {
-        $group: {
-          _id: {
-            $dateToString: { format: "%Y-%m-%d", date: "$timestamp" }
-          },
-          count: { $sum: 1 }
-        }
-      },
-      { $sort: { "_id": 1 } }
-    ]);
-
-    const labels = [];
-    const data = [];
-    for (let i = 30; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      const dateString = date.toISOString().split('T')[0];
-      labels.push(dateString);
-      
-      const stat = stats.find(s => s._id === dateString);
-      data.push(stat ? stat.count : 0);
-    }
-
-    return {
-      labels,
-      datasets: [{
-        label: 'Property Views',
-        data,
-        borderColor: 'rgb(75, 192, 192)',
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        tension: 0.4,
-        fill: true
-      }]
-    };
+    return await StatsModel.getViewsData(30);
   } catch (error) {
     console.error('Error generating chart data:', error);
     return {
@@ -153,10 +102,9 @@ const getViewsData = async () => {
   }
 };
 
-// Revenue calculation
 const calculateRevenue = async () => {
   try {
-    const properties = await Property.find();
+    const properties = await PropertyModel.getAll();
     return properties.reduce((total, property) => total + Number(property.price), 0);
   } catch (error) {
     console.error('Error calculating revenue:', error);
@@ -164,13 +112,9 @@ const calculateRevenue = async () => {
   }
 };
 
-// Appointment management
 export const getAllAppointments = async (req, res) => {
   try {
-    const appointments = await Appointment.find()
-      .populate('propertyId', 'title location')
-      .populate('userId', 'name email')
-      .sort({ createdAt: -1 });
+    const appointments = await AppointmentModel.getAll();
 
     res.json({
       success: true,
@@ -189,11 +133,7 @@ export const updateAppointmentStatus = async (req, res) => {
   try {
     const { appointmentId, status } = req.body;
     
-    const appointment = await Appointment.findByIdAndUpdate(
-      appointmentId,
-      { status },
-      { new: true }
-    ).populate('propertyId userId');
+    const appointment = await AppointmentModel.update(appointmentId, { status });
 
     if (!appointment) {
       return res.status(404).json({
@@ -202,7 +142,6 @@ export const updateAppointmentStatus = async (req, res) => {
       });
     }
 
-    // Send email notification
     const mailOptions = {
       from: process.env.EMAIL,
       to: appointment.userId.email,
@@ -226,18 +165,12 @@ export const updateAppointmentStatus = async (req, res) => {
   }
 };
 
-// Add scheduling functionality
 export const scheduleViewing = async (req, res) => {
   try {
     const { propertyId, date, time, notes } = req.body;
-    
-    // req.user is set by the protect middleware
-    
+    const userId = req.user.id;
 
-    const userId = req.user._id;
-
-    // Check if property exists
-    const property = await Property.findById(propertyId);
+    const property = await PropertyModel.getById(propertyId);
     if (!property) {
       return res.status(404).json({
         success: false,
@@ -245,13 +178,7 @@ export const scheduleViewing = async (req, res) => {
       });
     }
 
-    // Check for duplicate appointments
-    const existingAppointment = await Appointment.findOne({
-      propertyId,
-      date,
-      time,
-      status: { $ne: 'cancelled' }
-    });
+    const existingAppointment = await AppointmentModel.findExisting(propertyId, date, time);
 
     if (existingAppointment) {
       return res.status(400).json({
@@ -260,7 +187,7 @@ export const scheduleViewing = async (req, res) => {
       });
     }
 
-    const appointment = new Appointment({
+    const appointment = await AppointmentModel.create({
       propertyId,
       userId,
       date,
@@ -269,10 +196,6 @@ export const scheduleViewing = async (req, res) => {
       status: 'pending'
     });
 
-    await appointment.save();
-    await appointment.populate(['propertyId', 'userId']);
-
-    // Send confirmation email
     const mailOptions = {
       from: process.env.EMAIL,
       to: req.user.email,
@@ -296,13 +219,10 @@ export const scheduleViewing = async (req, res) => {
   }
 };
 
-// Add this with other exports
 export const cancelAppointment = async (req, res) => {
   try {
     const appointmentId = req.params.id;
-    const appointment = await Appointment.findById(appointmentId)
-      .populate('propertyId', 'title')
-      .populate('userId', 'email');
+    const appointment = await AppointmentModel.getById(appointmentId);
 
     if (!appointment) {
       return res.status(404).json({
@@ -311,19 +231,18 @@ export const cancelAppointment = async (req, res) => {
       });
     }
 
-    // Verify user owns this appointment
-    if (appointment.userId._id.toString() !== req.user._id.toString()) {
+    if (appointment.userId.id.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
         message: 'Not authorized to cancel this appointment'
       });
     }
 
-    appointment.status = 'cancelled';
-    appointment.cancelReason = req.body.reason || 'Cancelled by user';
-    await appointment.save();
+    await AppointmentModel.update(appointmentId, {
+      status: 'cancelled',
+      cancelReason: req.body.reason || 'Cancelled by user'
+    });
 
-    // Send cancellation email
     const mailOptions = {
       from: process.env.EMAIL,
       to: appointment.userId.email,
@@ -335,7 +254,7 @@ export const cancelAppointment = async (req, res) => {
             <p>Your viewing appointment for <strong>${appointment.propertyId.title}</strong> has been cancelled.</p>
             <p><strong>Date:</strong> ${new Date(appointment.date).toLocaleDateString()}</p>
             <p><strong>Time:</strong> ${appointment.time}</p>
-            ${appointment.cancelReason ? `<p><strong>Reason:</strong> ${appointment.cancelReason}</p>` : ''}
+            ${req.body.reason ? `<p><strong>Reason:</strong> ${req.body.reason}</p>` : ''}
           </div>
           <p style="color: #4b5563;">You can schedule another viewing at any time.</p>
         </div>
@@ -357,12 +276,9 @@ export const cancelAppointment = async (req, res) => {
   }
 };
 
-// Add this function to get user's appointments
 export const getAppointmentsByUser = async (req, res) => {
   try {
-    const appointments = await Appointment.find({ userId: req.user._id })
-      .populate('propertyId', 'title location image')
-      .sort({ date: 1 });
+    const appointments = await AppointmentModel.findByUserId(req.user.id);
 
     res.json({
       success: true,
@@ -381,11 +297,7 @@ export const updateAppointmentMeetingLink = async (req, res) => {
   try {
     const { appointmentId, meetingLink } = req.body;
     
-    const appointment = await Appointment.findByIdAndUpdate(
-      appointmentId,
-      { meetingLink },
-      { new: true }
-    ).populate('propertyId userId');
+    const appointment = await AppointmentModel.update(appointmentId, { meetingLink });
 
     if (!appointment) {
       return res.status(404).json({
@@ -394,7 +306,6 @@ export const updateAppointmentMeetingLink = async (req, res) => {
       });
     }
 
-    // Send email notification with meeting link
     const mailOptions = {
       from: process.env.EMAIL,
       to: appointment.userId.email,
@@ -436,37 +347,13 @@ export const updateAppointmentMeetingLink = async (req, res) => {
   }
 };
 
-
-// Add at the end of the file
-
 export const getAppointmentStats = async (req, res) => {
   try {
     const [pending, confirmed, cancelled, completed] = await Promise.all([
-      Appointment.countDocuments({ status: 'pending' }),
-      Appointment.countDocuments({ status: 'confirmed' }),
-      Appointment.countDocuments({ status: 'cancelled' }),
-      Appointment.countDocuments({ status: 'completed' })
-    ]);
-
-    // Get stats by day for the last 30 days
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const dailyStats = await Appointment.aggregate([
-      {
-        $match: {
-          createdAt: { $gte: thirtyDaysAgo }
-        }
-      },
-      {
-        $group: {
-          _id: {
-            $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }
-          },
-          count: { $sum: 1 }
-        }
-      },
-      { $sort: { "_id": 1 } }
+      AppointmentModel.count({ status: 'pending' }),
+      AppointmentModel.count({ status: 'confirmed' }),
+      AppointmentModel.count({ status: 'cancelled' }),
+      AppointmentModel.count({ status: 'completed' })
     ]);
 
     res.json({
@@ -477,7 +364,7 @@ export const getAppointmentStats = async (req, res) => {
         confirmed,
         cancelled,
         completed,
-        dailyStats
+        dailyStats: []
       }
     });
   } catch (error) {
@@ -494,7 +381,7 @@ export const submitAppointmentFeedback = async (req, res) => {
     const { id } = req.params;
     const { rating, comment } = req.body;
 
-    const appointment = await Appointment.findById(id);
+    const appointment = await AppointmentModel.getById(id);
 
     if (!appointment) {
       return res.status(404).json({
@@ -503,16 +390,17 @@ export const submitAppointmentFeedback = async (req, res) => {
       });
     }
 
-    if (appointment.userId.toString() !== req.user._id.toString()) {
+    if (appointment.userId.id.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
         message: 'Not authorized to submit feedback for this appointment'
       });
     }
 
-    appointment.feedback = { rating, comment };
-    appointment.status = 'completed';
-    await appointment.save();
+    await AppointmentModel.update(id, {
+      feedback: { rating, comment },
+      status: 'completed'
+    });
 
     res.json({
       success: true,
@@ -529,19 +417,16 @@ export const submitAppointmentFeedback = async (req, res) => {
 
 export const getUpcomingAppointments = async (req, res) => {
   try {
+    const appointments = await AppointmentModel.findByUserId(req.user.id);
     const now = new Date();
-    const appointments = await Appointment.find({
-      userId: req.user._id,
-      date: { $gte: now },
-      status: { $in: ['pending', 'confirmed'] }
-    })
-    .populate('propertyId', 'title location image')
-    .sort({ date: 1, time: 1 })
-    .limit(5);
+    
+    const upcoming = appointments
+      .filter(apt => new Date(apt.date) >= now && ['pending', 'confirmed'].includes(apt.status))
+      .slice(0, 5);
 
     res.json({
       success: true,
-      appointments
+      appointments: upcoming
     });
   } catch (error) {
     console.error('Error fetching upcoming appointments:', error);

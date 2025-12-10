@@ -3,23 +3,32 @@ import { config } from '../config/config.js';
 
 class FirecrawlService {
     constructor() {
-        this.firecrawl = new FirecrawlApp({
-            apiKey: config.firecrawlApiKey
-        });
+        if (config.firecrawlApiKey) {
+            this.firecrawl = new FirecrawlApp({
+                apiKey: config.firecrawlApiKey
+            });
+            this.isConfigured = true;
+        } else {
+            console.warn('Warning: FIRECRAWL_API_KEY not set. Property search features will be unavailable.');
+            this.firecrawl = null;
+            this.isConfigured = false;
+        }
     }
 
     async findProperties(city, maxPrice, propertyCategory = "Residential", propertyType = "Flat", limit = 6) {
+        if (!this.isConfigured) {
+            throw new Error('Firecrawl is not configured. Please set FIRECRAWL_API_KEY environment variable.');
+        }
+
         try {
             const formattedLocation = city.toLowerCase().replace(/\s+/g, '-');
             
-            // URLs for property websites (using 99acres as an example)
             const urls = [
                 `https://www.99acres.com/property-in-${formattedLocation}-ffid/*`
             ];
 
             const propertyTypePrompt = propertyType === "Flat" ? "Flats" : "Individual Houses";
             
-            // Define schema directly as a JSON schema object
             const propertySchema = {
                 type: "object",
                 properties: {
@@ -99,10 +108,13 @@ class FirecrawlService {
     }
 
     async getLocationTrends(city, limit = 5) {
+        if (!this.isConfigured) {
+            throw new Error('Firecrawl is not configured. Please set FIRECRAWL_API_KEY environment variable.');
+        }
+
         try {
             const formattedLocation = city.toLowerCase().replace(/\s+/g, '-');
             
-            // Define schema directly as a JSON schema object
             const locationSchema = {
                 type: "object",
                 properties: {

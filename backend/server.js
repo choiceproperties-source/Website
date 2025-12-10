@@ -4,7 +4,6 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import compression from 'compression';
-import connectdb from './config/mongodb.js';
 import { trackAPIStats } from './middleware/statsMiddleware.js';
 import propertyrouter from './routes/ProductRouter.js';
 import userrouter from './routes/UserRoute.js';
@@ -83,12 +82,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-// Database connection
-connectdb().then(() => {
-  console.log('Database connected successfully');
-}).catch(err => {
-  console.error('Database connection error:', err);
-});
+// Using Supabase for database - no connection setup needed
+console.log('Using Supabase database');
 
 
 // API Routes
