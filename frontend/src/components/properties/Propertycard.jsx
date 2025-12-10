@@ -11,9 +11,13 @@ import {
   Heart,
   ChevronLeft,
   ChevronRight,
-  Eye
+  Eye,
+  Loader
 } from 'lucide-react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { Backendurl } from '../../App';
 
 const PropertyCard = ({ property, viewType }) => {
   const isGrid = viewType === 'grid';
@@ -21,6 +25,7 @@ const PropertyCard = ({ property, viewType }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showControls, setShowControls] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleNavigateToDetails = () => {
     navigate(`/properties/single/${property._id}`);
@@ -54,10 +59,47 @@ const PropertyCard = ({ property, viewType }) => {
     }
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.stopPropagation();
-    setIsSaved(!isSaved);
-    // Future: Save to backend /api/users/:id/saved-properties
+    
+    if (isSaving) return;
+    
+    try {
+      setIsSaving(true);
+      
+      if (isSaved) {
+        // Remove from saved
+        await axios.delete(`${Backendurl}/api/saved-properties/${property._id}`);
+        setIsSaved(false);
+        toast.success('Removed from saved properties');
+      } else {
+        // Save property
+        await axios.post(`${Backendurl}/api/saved-properties`, {
+          property: {
+            _id: property._id,
+            title: property.title,
+            location: property.location,
+            price: property.price,
+            type: property.type,
+            image: property.image,
+            beds: property.beds,
+            baths: property.baths
+          }
+        });
+        setIsSaved(true);
+        toast.success('Property saved!');
+      }
+    } catch (error) {
+      console.error('Error saving property:', error);
+      if (error.response?.data?.message?.includes('already saved')) {
+        setIsSaved(true);
+        toast.info('Property is already saved');
+      } else {
+        toast.error('Failed to save property');
+      }
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -131,10 +173,15 @@ const PropertyCard = ({ property, viewType }) => {
           <motion.button
             whileHover={{ scale: 1.1 }}
             onClick={handleSave}
+            disabled={isSaving}
             className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-red-50 
-              transition-colors shadow-lg"
+              transition-colors shadow-lg disabled:opacity-50"
           >
-            <Heart className={`w-4 h-4 transition-colors ${isSaved ? 'fill-red-600 text-red-600' : 'text-gray-700'}`} />
+            {isSaving ? (
+              <Loader className="w-4 h-4 text-gray-700 animate-spin" />
+            ) : (
+              <Heart className={`w-4 h-4 transition-colors ${isSaved ? 'fill-red-600 text-red-600' : 'text-gray-700'}`} />
+            )}
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.1 }}

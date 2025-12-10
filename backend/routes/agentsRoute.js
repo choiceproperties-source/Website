@@ -50,7 +50,6 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/agents - Create agent (admin only)
-// Middleware placeholder: adminAuth validates JWT token (implementation pending)
 router.post('/', adminAuth, async (req, res) => {
   try {
     const { name, email, phone, about, specialties, photo } = req.body;
@@ -58,7 +57,7 @@ router.post('/', adminAuth, async (req, res) => {
     if (!name || !email || !phone) {
       return res.status(400).json({
         success: false,
-        message: 'Missing required fields'
+        message: 'Missing required fields: name, email, phone'
       });
     }
 
@@ -81,6 +80,67 @@ router.post('/', adminAuth, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error creating agent',
+      error: error.message
+    });
+  }
+});
+
+// DELETE /api/agents/:id - Delete agent (admin only)
+router.delete('/:id', adminAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Check if agent exists
+    const agent = await AgentModel.getById(id);
+    if (!agent) {
+      return res.status(404).json({
+        success: false,
+        message: 'Agent not found'
+      });
+    }
+    
+    await AgentModel.delete(id);
+    
+    res.json({
+      success: true,
+      message: 'Agent deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting agent:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting agent',
+      error: error.message
+    });
+  }
+});
+
+// PUT /api/agents/:id - Update agent (admin only)
+router.put('/:id', adminAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+    
+    const agent = await AgentModel.getById(id);
+    if (!agent) {
+      return res.status(404).json({
+        success: false,
+        message: 'Agent not found'
+      });
+    }
+    
+    const updatedAgent = await AgentModel.update(id, updateData);
+    
+    res.json({
+      success: true,
+      message: 'Agent updated successfully',
+      data: updatedAgent
+    });
+  } catch (error) {
+    console.error('Error updating agent:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error updating agent',
       error: error.message
     });
   }

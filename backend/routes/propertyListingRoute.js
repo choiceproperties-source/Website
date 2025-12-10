@@ -1,6 +1,7 @@
 import express from 'express';
 import PropertyListingModel from '../models/PropertyListing.js';
 import imagekit from '../config/imagekit.js';
+import { adminAuth } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -147,8 +148,8 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// DELETE /api/properties/:id - Delete property
-router.delete('/:id', async (req, res) => {
+// DELETE /api/properties/:id - Delete property (admin only)
+router.delete('/:id', adminAuth, async (req, res) => {
   try {
     const { id } = req.params;
     await PropertyListingModel.remove(id);

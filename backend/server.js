@@ -17,6 +17,7 @@ import propertyListingRoute from './routes/propertyListingRoute.js';
 import applicationRoute from './routes/applicationRoute.js';
 import agentsRoute from './routes/agentsRoute.js';
 import contactRoute from './routes/contactRoute.js';
+import savedPropertiesRoute from './routes/savedPropertiesRoute.js';
 
 
 dotenv.config();
@@ -104,6 +105,7 @@ app.use('/api/properties', propertyListingRoute);
 app.use('/api/applications', applicationRoute);
 app.use('/api/agents', agentsRoute);
 app.use('/api/contact', contactRoute);
+app.use('/api/saved-properties', savedPropertiesRoute);
 
 
 app.use((err, req, res, next) => {
