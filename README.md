@@ -158,7 +158,7 @@ graph TB
     end
     
     subgraph "💾 Data Layer"
-        F[(MongoDB Atlas<br/>Database)]
+        F[(Supabase PostgreSQL<br/>Database)]
         G[ImageKit CDN<br/>Media Storage]
     end
     
@@ -274,11 +274,11 @@ graph TB
 <details>
 <summary><h3>📋 Prerequisites Checklist</h3></summary>
 
-- [ ] **Node.js** 16+ and **npm** 8+ ([Download](https://nodejs.org/))
-- [ ] **MongoDB** Atlas account ([Free Signup](https://www.mongodb.com/cloud/atlas))
+- [ ] **Node.js** 20+ and **npm** 10+ ([Download](https://nodejs.org/))
+- [ ] **Supabase** account for database ([Free Signup](https://supabase.com/))
 - [ ] **Git** ([Download](https://git-scm.com/))
 - [ ] **ImageKit** account for CDN ([Free Signup](https://imagekit.io/))
-- [ ] **Brevo** SMTP for emails ([Free Signup](https://www.brevo.com/))
+- [ ] **SMTP service** for emails (Brevo, SendGrid, etc.)
 
 </details>
 
@@ -287,10 +287,14 @@ graph TB
 ```bash
 # 🔥 Clone the repository
 git clone https://github.com/choiceproperties/choice-properties.git
-cd Real-Estate-Website
+cd choice-properties
+
+# 📋 Copy environment files
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
 
 # ⚡ Install all dependencies and start development servers
-npm run setup && npm run dev
+npm install && npm run dev
 ```
 
 <div align="center">
@@ -326,18 +330,14 @@ npm run setup && npm run dev
 # Backend setup
 cd backend
 npm install
-cp .env.example .env.local
-# Configure your .env.local file (see configuration section)
+cp .env.example .env
+# Configure your .env file with Supabase credentials and API keys
 npm run dev
 
 # Frontend setup (new terminal)
 cd frontend
 npm install
-npm run dev
-
-# Admin panel setup (new terminal)
-cd admin
-npm install
+cp .env.example .env
 npm run dev
 ```
 
@@ -370,8 +370,9 @@ Each application requires environment configuration. Here's a quick reference:
       <td valign="top">
 
 ```env
-# 🗄️ Database
-MONGO_URI=your_mongodb_connection
+# 🗄️ Database (Supabase)
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_key
 
 # 🔐 Security
 JWT_SECRET=your_jwt_secret
@@ -379,15 +380,16 @@ JWT_SECRET=your_jwt_secret
 # 📧 Email Service
 SMTP_USER=your_smtp_user
 SMTP_PASS=your_smtp_password
+SMTP_HOST=your_smtp_host
+SMTP_PORT=587
 
-# 🖼️ Image Storage
+# 🖼️ Image Storage (ImageKit)
 IMAGEKIT_PUBLIC_KEY=your_key
 IMAGEKIT_PRIVATE_KEY=your_key
 IMAGEKIT_URL_ENDPOINT=your_url
 
-# 🤖 AI Services (Optional)
-HUGGINGFACE_API_KEY=your_key
-OPENROUTER_API_KEY=your_key
+# 🤖 AI Services
+AZURE_API_KEY=your_azure_key
 FIRECRAWL_API_KEY=your_key
 ```
 
@@ -576,12 +578,12 @@ Framer Motion    → Smooth page transitions
 <summary><h4>⚙️ Backend Technologies</h4></summary>
 
 ```
-Node.js 18+      → JavaScript runtime environment
+Node.js 20+      → JavaScript runtime environment
 Express.js       → Web application framework
-MongoDB          → NoSQL document database
-Mongoose         → ODM for MongoDB
+Supabase         → PostgreSQL database
+PostgreSQL       → Relational database
 JWT              → JSON Web Token authentication
-Bcrypt           → Password hashing
+Bcryptjs         → Password hashing
 Multer           → File upload middleware
 Nodemailer       → Email delivery system
 Helmet           → Security headers
@@ -813,14 +815,14 @@ docs(readme): update installation guide
       <td>Vercel</td>
       <td>Vercel</td>
       <td>Railway/Render</td>
-      <td>MongoDB Atlas</td>
+      <td>Supabase PostgreSQL</td>
     </tr>
     <tr>
       <td><b>🟡 Alternative</b></td>
       <td>Netlify</td>
       <td>Netlify</td>
       <td>Heroku</td>
-      <td>Local MongoDB</td>
+      <td>Supabase Cloud</td>
     </tr>
     <tr>
       <td><b>🐳 Docker</b></td>

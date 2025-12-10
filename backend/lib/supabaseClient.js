@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Choice Properties
+ * Licensed under the MIT License
+ */
+
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 

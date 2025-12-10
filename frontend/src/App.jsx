@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Choice Properties
+ * Licensed under the MIT License
+ */
+
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
