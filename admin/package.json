@@ -3,12 +3,12 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "BuildEstate admin dashboard for property management",
-  "author": "Aayush Vaghela",
+  "description": "Choice Properties admin dashboard for property management",
+  "author": "Choice Properties Team",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AAYUSH412/Real-Estate-Website"
+    "url": "https://github.com/choiceproperties/choice-properties"
   },
   "scripts": {
     "dev": "vite",

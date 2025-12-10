@@ -1,4 +1,4 @@
-# BuildEstate API Testing Guide
+# Choice Properties API Testing Guide
 
 This guide provides examples for testing all API endpoints using curl, Postman, or any HTTP client.
 
@@ -400,7 +400,7 @@ curl -X GET $BASE_URL/status
 #!/bin/bash
 # Quick API health check
 
-echo "Testing BuildEstate API..."
+echo "Testing Choice Properties API..."
 
 # Health check
 echo "1. Health check:"

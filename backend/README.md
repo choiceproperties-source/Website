@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚙️ BuildEstate Backend
+# ⚙️ Choice Properties Backend
 
 ### Robust Node.js API Server with AI Integration
 
@@ -9,7 +9,7 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-8.9+-47A248?style=flat-square&logo=mongodb)](https://www.mongodb.com/)
 [![JWT](https://img.shields.io/badge/JWT-Auth-000000?style=flat-square&logo=jsonwebtokens)](https://jwt.io/)
 
-[🔗 API Docs](../API_TESTING_GUIDE.md) • [📚 Backend Guide](../BACKEND_DOCUMENTATION.md) • [🐛 Report Issues](https://github.com/AAYUSH412/Real-Estate-Website/issues)
+[🔗 API Docs](../API_TESTING_GUIDE.md) • [📚 Backend Guide](../BACKEND_DOCUMENTATION.md) • [🐛 Report Issues](https://github.com/choiceproperties/choice-properties/issues)
 
 </div>
 
@@ -103,7 +103,7 @@ Create `.env.local` file with the following variables:
 # Application
 NODE_ENV=development
 PORT=4000
-APP_NAME=BuildEstate API
+APP_NAME=Choice Properties API
 
 # Database Configuration
 MONGODB_URI=mongodb://localhost:27017/buildestate
@@ -470,7 +470,7 @@ CMD ["npm", "start"]
 
 ```bash
 # On your server
-git clone https://github.com/AAYUSH412/Real-Estate-Website.git
+git clone https://github.com/choiceproperties/choice-properties.git
 cd Real-Estate-Website/backend
 
 # Install dependencies
@@ -669,7 +669,7 @@ pm2 logs buildestate-api
 
 - Check [Backend Documentation](../BACKEND_DOCUMENTATION.md)
 - Review [API Testing Guide](../API_TESTING_GUIDE.md)
-- Submit [GitHub Issues](https://github.com/AAYUSH412/Real-Estate-Website/issues)
+- Submit [GitHub Issues](https://github.com/choiceproperties/choice-properties/issues)
 
 ---
 
@@ -695,9 +695,9 @@ pm2 logs buildestate-api
 
 <div align="center">
 
-**Powering BuildEstate with robust API architecture**
+**Powering Choice Properties with robust API architecture**
 
-[⭐ Star](https://github.com/AAYUSH412/Real-Estate-Website) • [🐛 Issues](https://github.com/AAYUSH412/Real-Estate-Website/issues) • [📖 Docs](../README.md)
+[⭐ Star](https://github.com/choiceproperties/choice-properties) • [🐛 Issues](https://github.com/choiceproperties/choice-properties/issues) • [📖 Docs](../README.md)
 
 </div> 
 - **Railway**
@@ -711,4 +711,4 @@ pm2 logs buildestate-api
 
 ---
 
-Built with ❤️ for BuildEstate
+Built with ❤️ for Choice Properties

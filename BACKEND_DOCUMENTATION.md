@@ -1,13 +1,13 @@
-# BuildEstate Backend Documentation
+# Choice Properties Backend Documentation
 
 
 
 <div align="center">
-  <img src="./frontend/src/assets/home-regular-24.png" alt="BuildEstate Logo" width="100" />
+  <img src="./frontend/src/assets/home-regular-24.png" alt="Choice Properties Logo" width="100" />
   
-  <h2>🏠 BuildEstate Backend API</h2>
+  <h2>🏠 Choice Properties Backend API</h2>
   
-  > Complete guide to setup and run the BuildEstate backend server
+  > Complete guide to setup and run the Choice Properties backend server
   
   [![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=nodedotjs)](https://nodejs.org/)
   [![Express](https://img.shields.io/badge/Express-4.21+-000000?style=for-the-badge&logo=express)](https://expressjs.com/)
@@ -608,7 +608,7 @@ This project is licensed under the ISC License - see the [LICENSE](../LICENSE) f
 ---
 
 <div align="center">
-  <p>Built with ❤️ by the BuildEstate Team</p>
+  <p>Built with ❤️ by the Choice Properties Team</p>
   <p>
     <a href="https://github.com/AAYUSH412/Real-Estate-Website">GitHub</a> •
     <a href="https://buildestate.vercel.app">Live Demo</a> •

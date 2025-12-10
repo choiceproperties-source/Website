@@ -1,12 +1,12 @@
-# 🚀 How to Run BuildEstate Project - Complete Guide
+# 🚀 How to Run Choice Properties Project - Complete Guide
 
 
 
-This guide provides step-by-step instructions to run the complete BuildEstate real estate platform locally.
+This guide provides step-by-step instructions to run the complete Choice Properties real estate platform locally.
 
 ## 📋 Project Components
 
-BuildEstate consists of three main applications:
+Choice Properties consists of three main applications:
 
 1. **Backend API** (Port 4000) - Express.js server with MongoDB
 2. **Frontend** (Port 5173) - React user interface  

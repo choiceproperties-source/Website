@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌐 BuildEstate Frontend
+# 🌐 Choice Properties Frontend
 
 ### Modern React Application for Real Estate Platform
 
@@ -9,7 +9,7 @@
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3+-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
 [![Framer Motion](https://img.shields.io/badge/Framer_Motion-latest-0055FF?style=flat-square&logo=framer)](https://www.framer.com/motion/)
 
-[🚀 Live Demo](https://buildestate.vercel.app) • [📚 Documentation](../README.md) • [🐛 Report Issues](https://github.com/AAYUSH412/Real-Estate-Website/issues)
+[🚀 Live Demo](https://choiceproperties.com) • [📚 Documentation](../README.md) • [🐛 Report Issues](https://github.com/choiceproperties/choice-properties/issues)
 
 </div>
 
@@ -70,8 +70,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/AAYUSH412/Real-Estate-Website.git
-cd Real-Estate-Website/frontend
+git clone https://github.com/choiceproperties/choice-properties.git
+cd choice-properties/frontend
 
 # Install dependencies
 npm install
@@ -89,7 +89,7 @@ Create a `.env.local` file in the frontend directory:
 ```bash
 # API Configuration
 VITE_API_URL=http://localhost:4000/api
-VITE_APP_NAME=BuildEstate
+VITE_APP_NAME=Choice Properties
 
 # External Services (Optional)
 VITE_IMAGEKIT_URL=your-imagekit-url
@@ -325,7 +325,7 @@ Set these in your deployment platform:
 
 ```bash
 VITE_API_URL=https://your-api-domain.com/api
-VITE_APP_NAME=BuildEstate
+VITE_APP_NAME=Choice Properties
 VITE_IMAGEKIT_URL=https://your-imagekit-url
 VITE_GOOGLE_MAPS_API_KEY=your-production-maps-key
 VITE_ENVIRONMENT=production
@@ -422,8 +422,8 @@ npm run build
 ### Getting Help
 
 - Check the [main documentation](../README.md)
-- Look at [GitHub Issues](https://github.com/AAYUSH412/Real-Estate-Website/issues)
-- Join our [Discussions](https://github.com/AAYUSH412/Real-Estate-Website/discussions)
+- Look at [GitHub Issues](https://github.com/choiceproperties/choice-properties/issues)
+- Join our [Discussions](https://github.com/choiceproperties/choice-properties/discussions)
 
 ---
 
@@ -448,6 +448,6 @@ npm run build
 
 **Built with ❤️ using React and modern web technologies**
 
-[⭐ Star](https://github.com/AAYUSH412/Real-Estate-Website) • [🐛 Issues](https://github.com/AAYUSH412/Real-Estate-Website/issues) • [💬 Discussions](https://github.com/AAYUSH412/Real-Estate-Website/discussions)
+[⭐ Star](https://github.com/choiceproperties/choice-properties) • [🐛 Issues](https://github.com/choiceproperties/choice-properties/issues) • [💬 Discussions](https://github.com/choiceproperties/choice-properties/discussions)
 
 </div>

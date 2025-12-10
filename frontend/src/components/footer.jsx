@@ -197,7 +197,7 @@ const socialLinks = [
   },
   { 
     icon: Github, 
-    href: 'https://github.com/AAYUSH412/Real-Estate-Website', 
+    href: 'https://github.com/choiceproperties/choice-properties', 
     label: 'GitHub', 
     color: 'from-gray-800 to-gray-600',
     hoverColor: 'hover:shadow-gray-800/25' 

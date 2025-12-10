@@ -3,9 +3,9 @@ import aayushimage from '../images/aayush.png';
 
 export const teamMembers = [
     {
-      name: 'Nakul Lagad',
+      name: 'Team Lead',
       position: 'Founder & CEO',
-      bio: 'With 15+ years in real estate, Nakul leads our vision of transforming property search.',
+      bio: 'With extensive experience in real estate, our team leads the vision of transforming property search.',
       image: nakulimage,
       social: {
         linkedin: '#',
@@ -14,7 +14,7 @@ export const teamMembers = [
       },
     },
     {
-      name: 'Aayush Vaghela',
+      name: 'Technical Lead',
       position: 'Chief Technology Officer',
       bio: "Tech innovator driving our platform's cutting-edge solutions.",
       image: aayushimage,

@@ -1,9 +1,9 @@
-# 🏠 BuildEstate - Complete Project Setup & Running Guide
+# 🏠 Choice Properties - Complete Project Setup & Running Guide
 
 
 
 <div align="center">
-  <h1>🏠 BuildEstate</h1>
+  <h1>🏠 Choice Properties</h1>
   <p><em>A comprehensive real estate platform with AI-powered insights, user management, and admin dashboard</em></p>
   
   ![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=flat-square&logo=react)
@@ -33,7 +33,7 @@
 
 ## 🎯 Project Overview
 
-BuildEstate is a modern, full-stack real estate platform consisting of three interconnected applications:
+Choice Properties is a modern, full-stack real estate platform consisting of three interconnected applications:
 
 ### 🌐 **Frontend** (User Portal)
 - **Port**: 5173
@@ -75,7 +75,7 @@ BuildEstate is a modern, full-stack real estate platform consisting of three int
 ## 🏗️ System Architecture
 
 ```
-BuildEstate Platform Architecture
+Choice Properties Platform Architecture
 ├── Frontend (React + Vite) 🌐
 │   ├── Port: 5173
 │   ├── Public-facing website
@@ -602,7 +602,7 @@ Use tools like Postman or Insomnia to test API endpoints:
 
 ### Project Structure
 ```
-BuildEstate/
+Choice Properties/
 ├── backend/                 # Express.js API server
 │   ├── config/             # Database and service configs
 │   ├── controller/         # Route handlers

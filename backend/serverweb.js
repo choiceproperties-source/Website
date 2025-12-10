@@ -450,7 +450,7 @@ export default function getStatusPage() {
             <p>© ${new Date().getFullYear()} BuildEstate. All rights reserved. | 
             <a href="/health">Health Check</a> | 
             <a href="/status">API Status</a> | 
-            <a href="https://github.com/AAYUSH412/Real-Estate-Website" target="_blank">GitHub</a></p>
+            <a href="https://github.com/choiceproperties/choice-properties" target="_blank">GitHub</a></p>
             <p style="margin-top: 10px; font-size: 0.8rem; opacity: 0.8;">
               Built with Express.js, MongoDB, and ❤️ | Last updated: ${new Date().toLocaleString()}
             </p>

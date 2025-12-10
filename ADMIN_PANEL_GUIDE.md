@@ -1,8 +1,8 @@
-# BuildEstate Admin Panel Documentation
+# Choice Properties Admin Panel Documentation
 
 <div align="center">
   <h1>👨‍💼 Admin Dashboard Guide</h1>
-  <p><em>Complete guide for managing the BuildEstate platform</em></p>
+  <p><em>Complete guide for managing the Choice Properties platform</em></p>
 </div>
 
 
@@ -27,7 +27,7 @@
 
 ## 🎯 Overview
 
-The BuildEstate Admin Panel is a comprehensive management dashboard built with React 18, providing administrators with powerful tools to manage properties, users, appointments, and analytics.
+The Choice Properties Admin Panel is a comprehensive management dashboard built with React 18, providing administrators with powerful tools to manage properties, users, appointments, and analytics.
 
 ### Key Features
 - 📊 **Real-time Dashboard** with interactive charts
@@ -45,7 +45,7 @@ The BuildEstate Admin Panel is a comprehensive management dashboard built with R
 
 ### Prerequisites
 - Node.js v16+
-- Access to BuildEstate backend API
+- Access to Choice Properties backend API
 - Admin credentials
 
 ### Installation
