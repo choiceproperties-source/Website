@@ -54,6 +54,7 @@ const register = async (req, res) => {
     const newUser = await UserModel.create({ name, email, password: hashedPassword });
     const token = createtoken(newUser.id);
 
+    // Send welcome email asynchronously (don't block signup)
     const mailOptions = {
       from: process.env.EMAIL,
       to: email,
@@ -61,7 +62,10 @@ const register = async (req, res) => {
       html: getWelcomeTemplate(name)
     };
 
-    await transporter.sendMail(mailOptions);
+    // Non-blocking email send
+    transporter.sendMail(mailOptions).catch(err => {
+      console.warn('Welcome email failed to send:', err.message);
+    });
 
     return res.json({ token, user: { name: newUser.name, email: newUser.email }, success: true });
   } catch (error) {
