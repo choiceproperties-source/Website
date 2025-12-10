@@ -1,0 +1,72 @@
+# Replit AI Task: Step 5 – Final Polishing & Backend Integration
+
+## Instructions
+AI, execute the following tasks **carefully and in order**. Only work on the tasks listed below. **Do not touch unrelated pages or backend routes.**
+
+---
+
+### **Task 1: Connect Saved Properties to Backend**
+1. Update `/pages/SavedProperties.jsx`:
+   - Fetch real saved properties from backend:
+     - `GET /api/saved-properties`
+   - Connect “Save/Unsave” buttons to backend:
+     - `POST /api/saved-properties` → save property
+     - `DELETE /api/saved-properties/:id` → remove property
+   - Keep local dummy fallback until API is ready.
+   - Ensure responsive grid layout and smooth transitions.
+
+---
+
+### **Task 2: Complete Admin Panel CRUD Operations (Partial)**
+1. Update `/pages/AdminPanel.jsx`:
+   - Enable creating/deleting agents and property listings via backend.
+   - Apply `adminAuth` middleware to all admin routes.
+   - Keep table display of applications and stats intact.
+   - Ensure all buttons have hover/focus animations.
+
+---
+
+### **Task 3: Implement Image Upload in ListProperty**
+1. Update `/pages/ListProperty.jsx`:
+   - Fully integrate ImageKit file upload.
+   - Preview selected images before submission.
+   - Connect to `/api/properties` endpoint so images are saved in database.
+   - Keep form validation intact.
+
+---
+
+### **Task 4: Final Auth & Permissions Checks**
+1. Verify backend JWT middleware for admin-only routes:
+   - `GET /api/applications` → admin only
+   - `POST /api/agents` → admin only
+   - `DELETE /api/properties/:id` → admin only
+2. Ensure normal users cannot access admin endpoints.
+3. Return proper error messages for unauthorized requests.
+
+---
+
+### **Task 5: Minor UX Polishing**
+1. Ensure all toast notifications are working on:
+   - Apply.jsx
+   - Contact.jsx
+   - ListProperty.jsx
+   - SavedProperties.jsx
+2. Add smooth loading animations on dashboard tables.
+3. Check button spacing, hover states, and alignment across all new pages.
+
+---
+
+### **Important Notes**
+- **Do not modify unrelated components or routes.**
+- Ensure backward compatibility: existing workflows should continue running without errors.
+- Keep code modular and clean.
+- Apply responsive design for all new/updated pages.
+
+---
+
+**After completing these tasks:**
+- Saved properties feature fully functional.
+- Admin panel CRUD partially functional with stats and application display.
+- Image upload works correctly in ListProperty.
+- Admin routes enforce permissions.
+- Minor UI/UX issues fixed.
