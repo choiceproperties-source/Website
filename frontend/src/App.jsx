@@ -8,11 +8,11 @@ import Properties from './pages/Properties'
 import PropertyDetails from './components/properties/propertydetail';
 import Aboutus from './pages/About'
 import Contact from './pages/Contact'
-import Login from './components/login';
-import Signup from './components/signup';
-import ForgotPassword from './components/forgetpassword';
-import ResetPassword from './components/resetpassword';
-import Footer from './components/footer';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
+import Footer from './components/Footer';
 import NotFoundPage from './components/Notfound';
 import { AuthProvider } from './context/AuthContext';
 import AIPropertyHub from './pages/Aiagent'
