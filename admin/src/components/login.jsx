@@ -124,7 +124,7 @@ const Login = () => {
               Admin Portal
             </h1>
             <p className="text-gray-600 text-sm">
-              Sign in to manage BuildEstate properties
+              Sign in to manage Choice Properties
             </p>
           </motion.div>
 
@@ -151,7 +151,7 @@ const Login = () => {
                   onFocus={() => setFocusedField('email')}
                   onBlur={() => setFocusedField(null)}
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm"
-                  placeholder="admin@buildestate.com"
+                  placeholder="admin@choiceproperties.com"
                 />
               </div>
             </motion.div>
@@ -218,7 +218,7 @@ const Login = () => {
           {/* Footer */}
           <motion.div variants={itemVariants} className="mt-8 text-center">
             <p className="text-xs text-gray-500">
-              Secure admin access • BuildEstate © 2025
+              Secure admin access • Choice Properties © 2025
             </p>
           </motion.div>
         </div>

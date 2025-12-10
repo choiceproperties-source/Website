@@ -9,7 +9,7 @@ export default function getStatusPage() {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>BuildEstate API - Backend Dashboard</title>
+        <title>Choice Properties API - Backend Dashboard</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -288,7 +288,7 @@ export default function getStatusPage() {
       <body>
         <div class="dashboard">
           <div class="header">
-            <h1>🏠 BuildEstate API</h1>
+            <h1>🏠 Choice Properties API</h1>
             <p class="subtitle">Real Estate Platform Backend Service</p>
             <div class="status-badge">
               <div class="status-dot"></div>
@@ -407,7 +407,7 @@ export default function getStatusPage() {
             
             <div class="info-section">
               <h3>🚀 Platform Features</h3>
-              <p>BuildEstate is a comprehensive real estate platform that combines modern web technologies with AI-powered property analysis to deliver an exceptional user experience.</p>
+              <p>Choice Properties is a comprehensive real estate platform that combines modern web technologies with AI-powered property analysis to deliver an exceptional user experience.</p>
               
               <div class="feature-list">
                 <div class="feature-item">
@@ -447,12 +447,12 @@ export default function getStatusPage() {
           </div>
           
           <div class="footer">
-            <p>© ${new Date().getFullYear()} BuildEstate. All rights reserved. | 
+            <p>© ${new Date().getFullYear()} Choice Properties. All rights reserved. | 
             <a href="/health">Health Check</a> | 
             <a href="/status">API Status</a> | 
             <a href="https://github.com/choiceproperties/choice-properties" target="_blank">GitHub</a></p>
             <p style="margin-top: 10px; font-size: 0.8rem; opacity: 0.8;">
-              Built with Express.js, MongoDB, and ❤️ | Last updated: ${new Date().toLocaleString()}
+              Built with Express.js, PostgreSQL, and ❤️ | Last updated: ${new Date().toLocaleString()}
             </p>
           </div>
         </div>

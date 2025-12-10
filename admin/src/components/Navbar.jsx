@@ -101,7 +101,7 @@ const Navbar = () => {
             </motion.div>
             <div className="ml-3">
               <span className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                BuildEstate
+                Choice Properties
               </span>
               <div className="text-xs text-gray-500 font-medium">Admin Panel</div>
             </div>

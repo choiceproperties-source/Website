@@ -14,7 +14,7 @@
   <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge&logo=open-source-initiative&logoColor=white" alt="License">
   <img src="https://img.shields.io/badge/Node.js-18+-339933.svg?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js">
   <img src="https://img.shields.io/badge/React-18+-61DAFB.svg?style=for-the-badge&logo=react&logoColor=white" alt="React">
-  <img src="https://img.shields.io/badge/MongoDB-Latest-47A248.svg?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB">
+  <img src="https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E.svg?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase">
 </p>
 
 <p align="center">
@@ -26,7 +26,7 @@
 
 <!-- Action Buttons -->
 <p align="center">
-  <a href="https://buildestate.vercel.app">
+  <a href="#live-demo">
     <img src="https://img.shields.io/badge/Live_Demo-4285F4?style=for-the-badge&logoColor=white" alt="Live Demo">
   </a>
   <a href="./API_TESTING_GUIDE.md">
@@ -226,8 +226,8 @@ graph TB
       <tr>
         <td><b>Database</b></td>
         <td>
-          <img src="https://img.shields.io/badge/MongoDB-8.9-47A248?style=flat-square&logo=mongodb" alt="MongoDB">
-          <img src="https://img.shields.io/badge/Mongoose-ODM-880000?style=flat-square" alt="Mongoose">
+          <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&logo=supabase" alt="Supabase">
+          <img src="https://img.shields.io/badge/PostgreSQL-336791?style=flat-square&logo=postgresql" alt="PostgreSQL">
         </td>
         <td>Data persistence & modeling</td>
         <td>🟢 Production Ready</td>
@@ -414,7 +414,7 @@ VITE_BRAND_NAME=Choice Properties
 VITE_BACKEND_URL=http://localhost:4000
 
 # 👨‍💼 Admin Settings
-VITE_ADMIN_EMAIL=admin@buildestate.com
+VITE_ADMIN_EMAIL=admin@choiceproperties.com
 VITE_ADMIN_NAME=Choice Properties Admin
 ```
 
@@ -434,9 +434,9 @@ VITE_ADMIN_NAME=Choice Properties Admin
   <table>
     <tr>
       <td align="center" width="25%">
-        <img src="https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB">
+        <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase">
         <br>
-        <a href="https://www.mongodb.com/cloud/atlas">Free Atlas Setup</a>
+        <a href="https://supabase.com/">Free Supabase Setup</a>
       </td>
       <td align="center" width="25%">
         <img src="https://img.shields.io/badge/ImageKit-0066CC?style=for-the-badge&logo=imagekit&logoColor=white" alt="ImageKit">

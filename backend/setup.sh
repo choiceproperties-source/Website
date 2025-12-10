@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# BuildEstate Backend Quick Setup Script
-# This script helps you set up the BuildEstate backend quickly
+# Choice Properties Backend Quick Setup Script
+# This script helps you set up the Choice Properties backend quickly
 
 # Colors for output
 RED='\033[0;31m'
@@ -33,7 +33,7 @@ print_header() {
 }
 
 # Header
-print_header "🏠 BuildEstate Backend Setup"
+print_header "🏠 Choice Properties Backend Setup"
 print_header "============================"
 echo ""
 
@@ -127,7 +127,7 @@ if [ ! -f ".env.local" ]; then
         print_status ".env.local created successfully"
         echo ""
         print_warning "IMPORTANT: Please edit .env.local and add your actual configuration values:"
-        echo "   - MongoDB connection string (MONGO_URI)"
+        echo "   - Supabase connection (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)"
         echo "   - JWT secret (JWT_SECRET)"
         echo "   - Email configuration (SMTP_USER, SMTP_PASS)"
         echo "   - AI service API keys (AZURE_AI_KEY, FIRECRAWL_API_KEY)"
@@ -136,8 +136,9 @@ if [ ! -f ".env.local" ]; then
     else
         print_warning ".env.example not found. Creating basic .env.local template..."
         cat > .env.local << EOF
-# MongoDB Configuration
-MONGO_URI=mongodb://localhost:27017/buildestate
+# Supabase Configuration
+SUPABASE_URL=your-supabase-url
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
 
 # JWT Configuration
 JWT_SECRET=your-super-secret-jwt-key-here
@@ -168,10 +169,10 @@ else
     # Check if required variables are set
     print_info "🔍 Checking environment configuration..."
     
-    if grep -q "MONGO_URI=" .env.local && ! grep -q "MONGO_URI=$" .env.local; then
-        print_status "MongoDB URI configured"
+    if grep -q "SUPABASE_URL=" .env.local && ! grep -q "SUPABASE_URL=$" .env.local; then
+        print_status "Supabase URL configured"
     else
-        print_warning "MongoDB URI not configured in .env.local"
+        print_warning "Supabase URL not configured in .env.local"
     fi
     
     if grep -q "JWT_SECRET=" .env.local && ! grep -q "JWT_SECRET=$" .env.local; then
@@ -205,7 +206,7 @@ echo ""
 
 print_header "📋 Next steps:"
 echo "   1. Edit .env.local with your configuration"
-echo "   2. Ensure MongoDB is running (local or Atlas)"
+echo "   2. Configure Supabase connection (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)"
 echo "   3. Run 'npm run dev' to start the development server"
 echo "   4. Server will be available at http://localhost:4000"
 echo ""
@@ -228,26 +229,9 @@ echo "   • API: API_TESTING_GUIDE.md"
 echo "   • Setup: COMPLETE_PROJECT_SETUP_GUIDE.md"
 echo ""
 
-# Check if MongoDB is running locally (optional check)
-if command -v mongod &> /dev/null; then
-    if pgrep mongod > /dev/null; then
-        print_status "MongoDB is running locally"
-    elif command -v mongo &> /dev/null; then
-        if mongo --eval "db.adminCommand('ismaster')" > /dev/null 2>&1; then
-            print_status "MongoDB is accessible"
-        else
-            print_warning "MongoDB is not running locally (you may be using Atlas)"
-        fi
-    else
-        print_warning "MongoDB is not running locally (you may be using Atlas)"
-    fi
-elif command -v docker &> /dev/null; then
-    if docker ps | grep -q mongo; then
-        print_status "MongoDB is running in Docker"
-    else
-        print_info "Consider using Docker for MongoDB: docker run -d -p 27017:27017 mongo"
-    fi
-fi
+# Note: This project uses Supabase (PostgreSQL) - no local database setup required
+print_info "Database: This project uses Supabase (cloud PostgreSQL)"
+print_info "Configure your Supabase credentials in .env.local"
 
 # Check if ports are available
 if command -v lsof &> /dev/null; then

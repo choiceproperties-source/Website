@@ -137,7 +137,7 @@ export const updateAppointmentStatus = async (req, res) => {
       to: appointment.userId.email,
       subject: `Viewing Appointment ${
         status.charAt(0).toUpperCase() + status.slice(1)
-      } - BuildEstate`,
+      } - Choice Properties`,
       html: getEmailTemplate(appointment, status),
     };
 

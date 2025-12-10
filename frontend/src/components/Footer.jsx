@@ -359,8 +359,8 @@ const contactInfo = [
   },
   { 
     icon: Mail, 
-    text: 'support@buildestate.com',
-    href: 'mailto:support@buildestate.com' 
+    text: 'support@choiceproperties.com',
+    href: 'mailto:support@choiceproperties.com' 
   },
 ];
 
@@ -391,7 +391,7 @@ const Footer = () => {
               </motion.div>
               <div className="ml-4">
                 <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600">
-                  BuildEstate
+                  Choice Properties
                 </span>
                 <p className="text-sm text-gray-500 font-medium">Premium Real Estate</p>
               </div>
@@ -552,7 +552,7 @@ const Footer = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <span>© {new Date().getFullYear()} BuildEstate. All Rights Reserved.</span>
+              <span>© {new Date().getFullYear()} Choice Properties. All Rights Reserved.</span>
               <Heart className="w-4 h-4 text-red-400 animate-pulse" />
               <span className="text-gray-400">Made with love</span>
             </motion.p>
