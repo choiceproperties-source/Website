@@ -1,0 +1,67 @@
+📌 **Replit AI Task: Full Property Listing Integration for Choice Properties**
+
+**Project Context:**  
+- Frontend: React 18 + Tailwind CSS  
+- Backend: Express + Supabase  
+- Image Hosting: ImageKit  
+- Goal: End-to-end property listing form integration with image uploads and Supabase storage  
+
+---
+
+**Tasks for Replit AI:**
+
+1. **ListProperty.jsx Integration**
+   - Allow user to select multiple images
+   - Upload images to ImageKit
+   - Store returned image URLs in Supabase `properties` table
+   - Validate all form fields (title, price, location, type, features)
+   - Show success/error toast notifications
+
+2. **Supabase Backend**
+   - Ensure `POST /api/properties` receives all fields + image URLs
+   - Validate inputs server-side
+   - Return proper success/error JSON responses
+
+3. **Apply.jsx Integration**
+   - Form submission to `/api/applications`
+   - Validate user selection: rent, buy, sell
+   - Save to Supabase `applications` table
+   - Show toast notifications for success/failure
+
+4. **Agents.jsx / AgentDetail.jsx**
+   - GET `/api/agents` → list agents
+   - GET `/api/agents/:id` → show agent profile
+   - Optional: Admin POST `/api/agents`
+
+5. **Contact.jsx**
+   - Ensure POST `/api/contact` works
+   - Save submissions in Supabase
+
+6. **Testing**
+   - Submit test forms
+   - Verify data saved in Supabase
+   - Verify image URLs display correctly
+   - Ensure errors handled gracefully
+
+---
+
+**Constraints:**
+- Do **not** break existing frontend routes
+- Use **Axios** for frontend API calls
+- Keep Tailwind classes intact
+- Use **ImageKit** for file upload
+- Keep backend modular and clean
+- Follow current folder structure
+
+---
+
+**Output Expected:**
+- Updated `ListProperty.jsx` with ImageKit + Supabase integration
+- Backend route `propertyListingRoute.js` handling images properly
+- Verified working end-to-end (frontend + backend + database)
+- Toast notifications for errors/success
+
+---
+
+**End Goal:**  
+A fully functional, tested property listing workflow where users can submit listings with images, saved correctly in Supabase, without breaking existing pages.

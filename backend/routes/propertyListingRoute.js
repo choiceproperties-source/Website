@@ -1,5 +1,6 @@
 import express from 'express';
 import PropertyListingModel from '../models/PropertyListing.js';
+import imagekit from '../config/imagekit.js';
 
 const router = express.Router();
 
@@ -48,18 +49,49 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/properties - Create property
+// POST /api/properties - Create property with images
 router.post('/', async (req, res) => {
   try {
-    const { title, address, city, state, zip, price, beds, baths, sqft, description, amenities, contact_phone, contact_email, images } = req.body;
+    const { 
+      title, 
+      address, 
+      city, 
+      state, 
+      zip, 
+      price, 
+      beds, 
+      baths, 
+      sqft, 
+      description, 
+      amenities, 
+      contact_phone, 
+      contact_email, 
+      images 
+    } = req.body;
 
+    // Validate required fields
     if (!title || !address || !city || !state || !zip || !price || !beds || !baths || !sqft) {
       return res.status(400).json({
         success: false,
-        message: 'Missing required fields'
+        message: 'Missing required fields: title, address, city, state, zip, price, beds, baths, sqft'
       });
     }
 
+    if (!contact_phone || !contact_email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing contact information: contact_phone and contact_email required'
+      });
+    }
+
+    if (!images || !Array.isArray(images) || images.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'At least one image is required'
+      });
+    }
+
+    // Create property
     const property = await PropertyListingModel.create({
       title,
       address,
@@ -70,9 +102,9 @@ router.post('/', async (req, res) => {
       beds: parseInt(beds),
       baths: parseFloat(baths),
       sqft: parseInt(sqft),
-      description,
-      amenities,
-      images,
+      description: description || '',
+      amenities: amenities || '',
+      images: images, // Array of ImageKit URLs
       contact_phone,
       contact_email
     });
@@ -130,6 +162,21 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error deleting property',
+      error: error.message
+    });
+  }
+});
+
+// GET /api/imagekit-auth - Get auth token for client-side upload
+router.get('/imagekit-auth', async (req, res) => {
+  try {
+    const authParams = imagekit.getAuthenticationParameters();
+    res.json(authParams);
+  } catch (error) {
+    console.error('Error generating ImageKit auth:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error generating auth parameters',
       error: error.message
     });
   }

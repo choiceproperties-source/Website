@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, X, CheckCircle, ArrowRight, Home } from 'lucide-react';
+import { Upload, X, CheckCircle, ArrowRight, Home, Loader } from 'lucide-react';
 import axios from 'axios';
 import { Backendurl } from '../App';
 import { toast } from 'react-toastify';
@@ -18,15 +18,18 @@ const ListProperty = () => {
     sqft: '',
     description: '',
     amenities: '',
-    phone: '',
-    email: ''
+    contact_phone: '',
+    contact_email: ''
   });
 
   const [thumbnail, setThumbnail] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState(null);
   const [galleryImages, setGalleryImages] = useState([]);
   const [galleryPreviews, setGalleryPreviews] = useState([]);
+  const [galleryUrls, setGalleryUrls] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const handleInputChange = (e) => {
@@ -37,9 +40,39 @@ const ListProperty = () => {
     }));
   };
 
+  const uploadImageToImageKit = async (file) => {
+    try {
+      // Get auth token from backend
+      const authResponse = await axios.get(`${Backendurl}/api/imagekit-auth`);
+      const { token, expire, signature } = authResponse.data;
+
+      const formDataForUpload = new FormData();
+      formDataForUpload.append('file', file);
+      formDataForUpload.append('publicKey', import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY);
+      formDataForUpload.append('signature', signature);
+      formDataForUpload.append('expire', expire);
+      formDataForUpload.append('token', token);
+
+      const response = await axios.post('https://upload.imagekit.io/api/v1/files/upload', formDataForUpload, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      return response.data.url;
+    } catch (error) {
+      console.error('ImageKit upload error:', error);
+      throw new Error('Failed to upload image');
+    }
+  };
+
   const handleThumbnailUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('Thumbnail image must be less than 10MB');
+        return;
+      }
       setThumbnail(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -51,7 +84,17 @@ const ListProperty = () => {
 
   const handleGalleryUpload = (e) => {
     const files = Array.from(e.target.files);
+    
+    if (files.length + galleryImages.length > 10) {
+      toast.error('Maximum 10 gallery images allowed');
+      return;
+    }
+
     files.forEach(file => {
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('Each image must be less than 10MB');
+        return;
+      }
       const reader = new FileReader();
       reader.onloadend = () => {
         setGalleryImages(prev => [...prev, file]);
@@ -64,13 +107,14 @@ const ListProperty = () => {
   const removeGalleryImage = (index) => {
     setGalleryImages(prev => prev.filter((_, i) => i !== index));
     setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
+    setGalleryUrls(prev => prev.filter((_, i) => i !== index));
   };
 
   const validateForm = () => {
-    const required = ['title', 'address', 'city', 'state', 'zip', 'price', 'beds', 'baths', 'sqft', 'phone', 'email'];
+    const required = ['title', 'address', 'city', 'state', 'zip', 'price', 'beds', 'baths', 'sqft', 'contact_phone', 'contact_email'];
     for (let field of required) {
       if (!formData[field]) {
-        toast.error(`Please fill in ${field}`);
+        toast.error(`Please fill in ${field.replace('contact_', '')}`);
         return false;
       }
     }
@@ -78,72 +122,99 @@ const ListProperty = () => {
       toast.error('Please upload a thumbnail image');
       return false;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contact_email)) {
       toast.error('Please enter a valid email');
       return false;
     }
     return true;
   };
 
+  const uploadAllImages = async () => {
+    try {
+      setUploading(true);
+
+      // Upload thumbnail
+      if (thumbnail && !thumbnailUrl) {
+        const url = await uploadImageToImageKit(thumbnail);
+        setThumbnailUrl(url);
+      }
+
+      // Upload gallery images
+      const newGalleryUrls = [...galleryUrls];
+      for (let i = 0; i < galleryImages.length; i++) {
+        if (!newGalleryUrls[i]) {
+          const url = await uploadImageToImageKit(galleryImages[i]);
+          newGalleryUrls[i] = url;
+        }
+      }
+      setGalleryUrls(newGalleryUrls);
+
+      return { thumbnailUrl, galleryUrls: newGalleryUrls };
+    } catch (error) {
+      console.error('Image upload failed:', error);
+      toast.error('Failed to upload images. Please try again.');
+      throw error;
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setLoading(true);
     try {
-      const formDataToSend = new FormData();
-      
-      // Add all text fields
-      Object.keys(formData).forEach(key => {
-        formDataToSend.append(key, formData[key]);
-      });
+      // Upload images to ImageKit
+      toast.info('Uploading images...');
+      const { thumbnailUrl: finalThumbUrl, galleryUrls: finalGalleryUrls } = await uploadAllImages();
 
-      // Add thumbnail
-      if (thumbnail) {
-        formDataToSend.append('thumbnail', thumbnail);
+      // Create property with image URLs
+      const propertyData = {
+        ...formData,
+        price: parseInt(formData.price),
+        beds: parseInt(formData.beds),
+        baths: parseFloat(formData.baths),
+        sqft: parseInt(formData.sqft),
+        images: [finalThumbUrl, ...finalGalleryUrls].filter(Boolean)
+      };
+
+      const response = await axios.post(`${Backendurl}/api/properties`, propertyData);
+
+      if (response.data.success) {
+        setSubmitted(true);
+        toast.success('Property listed successfully!');
+
+        // Reset form after 3 seconds
+        setTimeout(() => {
+          setFormData({
+            title: '',
+            address: '',
+            city: '',
+            state: '',
+            zip: '',
+            price: '',
+            beds: '',
+            baths: '',
+            sqft: '',
+            description: '',
+            amenities: '',
+            contact_phone: '',
+            contact_email: ''
+          });
+          setThumbnail(null);
+          setThumbnailPreview(null);
+          setThumbnailUrl(null);
+          setGalleryImages([]);
+          setGalleryPreviews([]);
+          setGalleryUrls([]);
+          setSubmitted(false);
+        }, 3000);
       }
-
-      // Add gallery images
-      galleryImages.forEach((image, index) => {
-        formDataToSend.append(`gallery_${index}`, image);
-      });
-
-      const response = await axios.post(`${Backendurl}/api/properties`, formDataToSend, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-
-      setSubmitted(true);
-      toast.success('Property listed successfully!');
-
-      // Reset form after 3 seconds
-      setTimeout(() => {
-        setFormData({
-          title: '',
-          address: '',
-          city: '',
-          state: '',
-          zip: '',
-          price: '',
-          beds: '',
-          baths: '',
-          sqft: '',
-          description: '',
-          amenities: '',
-          phone: '',
-          email: ''
-        });
-        setThumbnail(null);
-        setThumbnailPreview(null);
-        setGalleryImages([]);
-        setGalleryPreviews([]);
-        setSubmitted(false);
-      }, 3000);
     } catch (error) {
       console.error('Error listing property:', error);
-      toast.error('Failed to list property. Please try again.');
+      toast.error(error.response?.data?.message || 'Failed to list property. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -354,8 +425,8 @@ const ListProperty = () => {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Phone *</label>
                 <input
                   type="tel"
-                  name="phone"
-                  value={formData.phone}
+                  name="contact_phone"
+                  value={formData.contact_phone}
                   onChange={handleInputChange}
                   placeholder="(555) 123-4567"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
@@ -365,8 +436,8 @@ const ListProperty = () => {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Email *</label>
                 <input
                   type="email"
-                  name="email"
-                  value={formData.email}
+                  name="contact_email"
+                  value={formData.contact_email}
                   onChange={handleInputChange}
                   placeholder="your@email.com"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
@@ -381,7 +452,7 @@ const ListProperty = () => {
 
             {/* Thumbnail */}
             <div className="mb-8">
-              <label className="block text-sm font-semibold text-gray-700 mb-4">Thumbnail Image *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-4">Thumbnail Image * {uploading && thumbnailUrl === null && <Loader className="inline w-4 h-4 animate-spin ml-2" />}</label>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition cursor-pointer">
                 <input
                   type="file"
@@ -389,6 +460,7 @@ const ListProperty = () => {
                   onChange={handleThumbnailUpload}
                   className="hidden"
                   id="thumbnail-upload"
+                  disabled={uploading}
                 />
                 <label htmlFor="thumbnail-upload" className="cursor-pointer">
                   <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
@@ -399,22 +471,26 @@ const ListProperty = () => {
               {thumbnailPreview && (
                 <div className="mt-4 relative w-32 h-32">
                   <img src={thumbnailPreview} alt="Thumbnail" className="w-full h-full object-cover rounded-lg" />
-                  <button
-                    onClick={() => {
-                      setThumbnail(null);
-                      setThumbnailPreview(null);
-                    }}
-                    className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
+                  {thumbnailUrl && <div className="absolute top-1 right-1 bg-green-600 text-white p-1 rounded-full"><CheckCircle className="w-4 h-4" /></div>}
+                  {!thumbnailUrl && (
+                    <button
+                      onClick={() => {
+                        setThumbnail(null);
+                        setThumbnailPreview(null);
+                      }}
+                      type="button"
+                      className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               )}
             </div>
 
             {/* Gallery */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-4">Gallery Images</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-4">Gallery Images {uploading && galleryUrls.length < galleryImages.length && <Loader className="inline w-4 h-4 animate-spin ml-2" />}</label>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition cursor-pointer mb-6">
                 <input
                   type="file"
@@ -423,11 +499,12 @@ const ListProperty = () => {
                   onChange={handleGalleryUpload}
                   className="hidden"
                   id="gallery-upload"
+                  disabled={uploading}
                 />
                 <label htmlFor="gallery-upload" className="cursor-pointer">
                   <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                   <p className="text-gray-600 font-semibold mb-2">Upload multiple images</p>
-                  <p className="text-sm text-gray-500">Add up to 10 images</p>
+                  <p className="text-sm text-gray-500">Add up to 10 images (currently: {galleryImages.length})</p>
                 </label>
               </div>
 
@@ -436,12 +513,16 @@ const ListProperty = () => {
                   {galleryPreviews.map((preview, index) => (
                     <div key={index} className="relative group">
                       <img src={preview} alt={`Gallery ${index}`} className="w-full h-32 object-cover rounded-lg" />
-                      <button
-                        onClick={() => removeGalleryImage(index)}
-                        className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
+                      {galleryUrls[index] && <div className="absolute top-1 right-1 bg-green-600 text-white p-1 rounded-full"><CheckCircle className="w-3 h-3" /></div>}
+                      {!galleryUrls[index] && (
+                        <button
+                          onClick={() => removeGalleryImage(index)}
+                          type="button"
+                          className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -454,11 +535,20 @@ const ListProperty = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            disabled={loading}
+            disabled={loading || uploading}
             className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3 rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 border-t pt-8 mt-8"
           >
-            {loading ? 'Listing Property...' : 'List Property'}
-            <ArrowRight className="w-4 h-4" />
+            {loading || uploading ? (
+              <>
+                <Loader className="w-4 h-4 animate-spin" />
+                {uploading ? 'Uploading Images...' : 'Listing Property...'}
+              </>
+            ) : (
+              <>
+                List Property
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
           </motion.button>
         </motion.form>
       </div>
