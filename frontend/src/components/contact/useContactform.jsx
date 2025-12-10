@@ -13,6 +13,7 @@ export default function useContactForm() {
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
@@ -46,6 +47,7 @@ export default function useContactForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
+      setLoading(true);
       try {
         // POST to /api/contact endpoint - email notifications queued for future implementation
         const response = await axios.post(`${Backendurl}/api/contact`, formData);
@@ -55,11 +57,13 @@ export default function useContactForm() {
       } catch (error) {
         toast.error('Error submitting form. Please try again.');
         console.error('Error submitting form:', error);
+      } finally {
+        setLoading(false);
       }
     } else {
       console.log('Validation errors:', errors);
     }
   };
 
-  return { formData, errors, handleChange, handleSubmit };
+  return { formData, errors, handleChange, handleSubmit, loading };
 }

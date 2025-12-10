@@ -15,7 +15,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { toast } from "react-toastify";
-import { Backendurl } from "../App";
+import { Backendurl } from "../../App";
 
 // Enhanced Animation Variants
 const containerVariants = {

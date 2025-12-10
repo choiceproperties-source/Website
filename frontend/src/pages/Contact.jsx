@@ -1,7 +1,7 @@
 import React from 'react'
 import { motion } from 'framer-motion';
 import ContactHero from '../components/contact/ContactHero';
-import ContactForm from '../components/contact/contactForm';
+import ContactForm from '../components/contact/ContactForm';
 import ContactInfo from '../components/contact/ContactInfo';
 
 

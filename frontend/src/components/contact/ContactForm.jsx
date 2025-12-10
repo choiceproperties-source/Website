@@ -1,10 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Send } from 'lucide-react';
+import { Send, Loader } from 'lucide-react';
 import useContactForm from './useContactform';
 
 function ContactForm() {
-  const { formData, errors, handleChange, handleSubmit } = useContactForm();
+  const { formData, errors, handleChange, handleSubmit, loading } = useContactForm();
 
   return (
     <motion.div
@@ -82,10 +82,22 @@ function ContactForm() {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Send className="w-4 h-4 mr-2" />
-          Send Message
+          {loading ? (
+            <>
+              <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity }} className="mr-2">
+                <Loader className="w-4 h-4" />
+              </motion.div>
+              Sending...
+            </>
+          ) : (
+            <>
+              <Send className="w-4 h-4 mr-2" />
+              Send Message
+            </>
+          )}
         </button>
       </form>
     </motion.div>

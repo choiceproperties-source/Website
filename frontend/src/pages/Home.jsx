@@ -6,7 +6,7 @@ import FeaturedProperties from '../components/FeaturedProperties'
 import OurAgents from '../components/OurAgents'
 import WhyChooseUs from '../components/WhyChooseUs'
 import Steps from '../components/Steps'
-import Testimonials from '../components/testimonial'
+import Testimonials from '../components/Testimonial'
 import Blog from '../components/Blog'
 
 const Home = () => {

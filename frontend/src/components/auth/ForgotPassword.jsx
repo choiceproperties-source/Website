@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, ArrowLeft, Loader, Shield, CheckCircle, Sparkles, Key, Lock } from "lucide-react";
 import { toast } from "react-toastify";
-import { Backendurl } from "../App";
+import { Backendurl } from "../../App";
 
 // Animation variants
 const containerVariants = {

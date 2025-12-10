@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, FileText, DollarSign, Home, MessageSquare, ArrowRight, CheckCircle } from 'lucide-react';
+import { Mail, Phone, FileText, DollarSign, Home, MessageSquare, ArrowRight, CheckCircle, Loader } from 'lucide-react';
 import axios from 'axios';
 import { Backendurl } from '../App';
 import { toast } from 'react-toastify';
@@ -312,14 +312,25 @@ const Apply = () => {
 
           {/* Submit Button */}
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: loading ? 1 : 1.02 }}
+            whileTap={{ scale: loading ? 1 : 0.98 }}
             type="submit"
             disabled={loading}
             className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3 rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            {loading ? 'Submitting...' : 'Submit Application'}
-            <ArrowRight className="w-4 h-4" />
+            {loading ? (
+              <>
+                <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity }}>
+                  <Loader className="w-4 h-4" />
+                </motion.div>
+                Submitting...
+              </>
+            ) : (
+              <>
+                Submit Application
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
           </motion.button>
 
           <p className="text-center text-gray-600 text-sm mt-4">

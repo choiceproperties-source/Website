@@ -137,6 +137,7 @@ const AgentCard = ({ agent, onClick }) => {
 const Agents = () => {
   const navigate = useNavigate();
   const [agents, setAgents] = useState(sampleAgents);
+  const [selectedSpecialty, setSelectedSpecialty] = useState('All');
 
   useEffect(() => {
     const fetchAgents = async () => {
@@ -158,6 +159,16 @@ const Agents = () => {
     navigate(`/agents/${agentId}`);
   };
 
+  // Get unique specialties from all agents
+  const allSpecialties = ['All', ...new Set(agents.flatMap(agent => agent.specialties || []))];
+
+  // Filter agents by selected specialty
+  const filteredAgents = selectedSpecialty === 'All' 
+    ? agents 
+    : agents.filter(agent => 
+        agent.specialties && agent.specialties.includes(selectedSpecialty)
+      );
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
       {/* Hero Section */}
@@ -174,17 +185,47 @@ const Agents = () => {
         </motion.div>
       </div>
 
-      {/* Agents Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {agents.map((agent) => (
-            <AgentCard
-              key={agent.id}
-              agent={agent}
-              onClick={() => handleAgentClick(agent.id)}
-            />
-          ))}
+      {/* Specialty Filter */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Filter by Specialty</h2>
+          <div className="flex flex-wrap gap-3">
+            {allSpecialties.map((specialty) => (
+              <motion.button
+                key={specialty}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setSelectedSpecialty(specialty)}
+                className={`px-4 py-2 rounded-full font-medium transition-all ${
+                  selectedSpecialty === specialty
+                    ? 'bg-blue-600 text-white shadow-lg'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                {specialty}
+              </motion.button>
+            ))}
+          </div>
         </div>
+      </div>
+
+      {/* Agents Grid */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        {filteredAgents.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredAgents.map((agent) => (
+              <AgentCard
+                key={agent.id}
+                agent={agent}
+                onClick={() => handleAgentClick(agent.id)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">No agents found for this specialty.</p>
+          </div>
+        )}
       </div>
     </div>
   );
