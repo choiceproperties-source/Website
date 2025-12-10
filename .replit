@@ -50,16 +50,16 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
+localPort = 5001
+externalPort = 3002
+
+[[ports]]
 localPort = 8000
 externalPort = 8000
 
 [[ports]]
 localPort = 41593
 externalPort = 3000
-
-[[ports]]
-localPort = 42187
-externalPort = 3001
 
 [deployment]
 deploymentTarget = "static"
@@ -70,3 +70,9 @@ publicDir = "frontend/dist"
 
 [userenv.shared]
 PORT = "8000"
+SUPABASE_URL = "https://mqxfgfkrqwaspzosjbwh.supabase.co"
+SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xeGZnZmtycXdhc3B6b3NqYndoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNTM1MDQsImV4cCI6MjA4MDkyOTUwNH0.vaZDt9OxQM8e-3Xdh7OU5D5mxfIsVQjHUlJ8-_E8Bs8"
+SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xeGZnZmtycXdhc3B6b3NqYndoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTM1MzUwNCwiZXhwIjoyMDgwOTI5NTA0fQ.Hhxa6QffCJ8iMCo1tlPZUM1MPu68HWkYM0D2LNSC-v8"
+IMAGEKIT_PUBLIC_KEY = "public_0nFf9f2g4"
+IMAGEKIT_PRIVATE_KEY = "private_385bnuWrKb6U+EK+j/GT7meJggw="
+IMAGEKIT_URL_ENDPOINT = "https://ik.imagekit.io/fjmnb748e"
