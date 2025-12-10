@@ -153,8 +153,11 @@ const FeaturedProperties = () => {
     const fetchProperties = async () => {
       try {
         const response = await axios.get(`${Backendurl}/api/products`);
-        if (response.data && response.data.length > 0) {
-          setProperties(response.data.slice(0, 6));
+        const data = Array.isArray(response.data) ? response.data : response.data?.data || [];
+        if (data && data.length > 0) {
+          setProperties(data.slice(0, 6));
+        } else {
+          setProperties(sampleProperties);
         }
       } catch (error) {
         console.log('Using sample properties');

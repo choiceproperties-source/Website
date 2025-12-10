@@ -17,6 +17,10 @@ import NotFoundPage from './components/Notfound';
 import { AuthProvider } from './context/AuthContext';
 import AIPropertyHub from './pages/Aiagent'
 import StructuredData from './components/SEO/StructuredData';
+import Apply from './pages/Apply'
+import Rent from './pages/Rent'
+import Buy from './pages/Buy'
+import Sell from './pages/Sell'
 import 'react-toastify/dist/ReactToastify.css';
 
 
@@ -43,6 +47,10 @@ const App = () => {
         <Route path="/about" element={<Aboutus />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/ai-property-hub" element={<AIPropertyHub />} />
+        <Route path="/apply" element={<Apply />} />
+        <Route path="/rent" element={<Rent />} />
+        <Route path="/buy" element={<Buy />} />
+        <Route path="/sell" element={<Sell />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Footer />
